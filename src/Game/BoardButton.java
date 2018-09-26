@@ -26,7 +26,7 @@ class BoardButton extends JButton {
         if (belongsTo == 0)
             setBackground(game.rand.nextInt(100) < 15 && canPutHere() ? game.WALL : game.EMPTY);
         else
-            unitCount = 4;
+            unitCount = 8;
         addActionListener(new ClickListener());
         refresh();
     }
@@ -94,14 +94,22 @@ class BoardButton extends JButton {
         return true;
     }
 
-    private boolean findActiveDecreaseHisUnitAndRefreshIt() {
+    private BoardButton getActiveField() {
         for (int i = 0; i < game.boardSize; ++i) {
             for (int j = 0; j < game.boardSize; ++j) {
                 if (game.board[i][j].getActive())
-                    return game.board[i][j].decreaseUnit();
+                    return game.board[i][j];
             }
         }
-        return false;
+        return new BoardButton(game, -1, 0, 0);
+    }
+
+    private int getActiveFieldUnits() {
+        return getActiveField().getUnitCount();
+    }
+
+    private boolean findActiveDecreaseHisUnitAndRefreshIt() {
+        return getActiveField().decreaseUnit();
     }
 
     private void findActiveAndRemoveIt() {
@@ -140,6 +148,12 @@ class BoardButton extends JButton {
         return unitCount;
     }
 
+    private void setUnitCount(int units) {
+        if (units >= 1) {
+            unitCount = units;
+        }
+    }
+
     void setWaiting(boolean bool) {
         waiting = bool;
     }
@@ -167,7 +181,6 @@ class BoardButton extends JButton {
             game.board[x][y + 1].setWaiting(bool);
     }
 
-    //MAKE ALL THIS STUFF WORK!!!
     private class ClickListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -185,9 +198,44 @@ class BoardButton extends JButton {
                         setActive(false);
                 }
             } else if (waiting && !thereIsNoActive()) {
-                if (findActiveDecreaseHisUnitAndRefreshIt()) {
-                    addUnit();
-                    setBelonging(game.turn);
+                if (belongsTo != game.turn * -1) {
+                    if (findActiveDecreaseHisUnitAndRefreshIt()) {
+                        addUnit();
+                        setBelonging(game.turn);
+                    }
+                } else {
+                    int activeUnits = getActiveFieldUnits();
+                    int decision;
+
+                    if (activeUnits == unitCount) {
+                        decision = game.rand.nextInt(2);
+                        if (decision == 0) {
+                            setBelonging(game.turn);
+                        }
+                        getActiveField().setUnitCount(1);
+                        setUnitCount(1);
+                    } else if (activeUnits == unitCount + 1) {
+                        decision = game.rand.nextInt(4);
+                        if (decision != 0) {
+                            setBelonging(game.turn);
+                        }
+                        getActiveField().setUnitCount(1);
+                        setUnitCount(1);
+                    } else if (activeUnits == unitCount - 1) {
+                        decision = game.rand.nextInt(4);
+                        if (decision == 0) {
+                            setBelonging(game.turn);
+                        }
+                        getActiveField().setUnitCount(1);
+                        setUnitCount(1);
+                    } else if (activeUnits < unitCount) {
+                        setUnitCount(unitCount - activeUnits + 1);
+                        getActiveField().setUnitCount(1);
+                    } else {
+                        setBelonging(game.turn);
+                        setUnitCount(activeUnits - unitCount);
+                        getActiveField().setUnitCount(1);
+                    }
                 }
             }
 
