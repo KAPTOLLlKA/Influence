@@ -11,6 +11,7 @@ class MenuSettingCommands {
     private JPanel panel;
     private JTextField sizeField = new JTextField("Board size:");
     private JLabel turnShower = new JLabel();
+    private JButton passTurn = new JButton("Add Units");
 
     private final Color buttonColor = new Color(100, 0, 200);
 
@@ -207,7 +208,6 @@ class MenuSettingCommands {
         panel.setLayout(new GameboardLayout(game));
 
         JButton surrender = new JButton("Surrender");
-        JButton passTurn = new JButton("Pass Turn");
 
         surrender.setForeground(Color.BLACK);
         passTurn.setForeground(Color.BLACK);
@@ -411,7 +411,7 @@ class MenuSettingCommands {
             game.start();
         }
     }
-//TURN IS NO BEING PASSED
+
     private class PassTurnListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -420,6 +420,7 @@ class MenuSettingCommands {
             if (game.addingUnits) {
                 game.turn *= -1;
                 game.passTurnRefreshBoard();
+                game.addingUnits = false;
             } else {
                 game.unitSetCount = game.countPlayerUnits();
                 game.addingUnits = true;
