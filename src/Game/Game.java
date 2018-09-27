@@ -110,10 +110,13 @@ public class Game extends JFrame {
 
     void setTurnShower() {
         JLabel turnText = (JLabel) background.getComponent(background.getComponents().length - 1);
+        JButton surrenderButton = (JButton) background.getComponent(background.getComponents().length - 2);
         if (!addingUnits) {
             turnText.setText((turn == -1 ? "Blue's" : "Red's") + " turn.");
+            surrenderButton.setText("Add Units");
         } else {
-            turnText.setText("Unit Count: " + unitSetCount);
+            turnText.setText(unitSetCount > 0 ? "Unit Count: " + unitSetCount : "Pass Turn!");
+            surrenderButton.setText("Pass Turn");
         }
     }
 
