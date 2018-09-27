@@ -1,5 +1,6 @@
 package Game;
 
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -310,7 +311,7 @@ class MenuSettingCommands {
             if (game.sound) {
                 game.getClip("Sounds\\button.wav").start();
                 game.backgroundMusic = game.getClip("Sounds\\menu background.wav");
-                game.backgroundMusic.start();
+                game.backgroundMusic.loop(Clip.LOOP_CONTINUOUSLY);
             } else
                 game.backgroundMusic.close();
         }
