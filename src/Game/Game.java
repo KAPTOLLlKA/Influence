@@ -33,11 +33,13 @@ public class Game extends JFrame {
     boolean sound = true;
     boolean playerPlayer = false;
     boolean backgroundMusicPlaying = false;
+    boolean addingUnits = false;
 
     Object lastClickedButton;
     float lasClickTime;
 
     int menuIndex = 0;
+    int unitSetCount;
     boolean easy = false;
 
     public Game() {
@@ -74,6 +76,20 @@ public class Game extends JFrame {
         menuIndex = -1;
     }
 
+    int countPlayerUnits() {
+        int result = 0;
+
+        for (int i = 0; i < boardSize; ++i) {
+            for (int j = 0; j < boardSize; ++j) {
+                if (board[i][j].getBelonging() == turn) {
+                    ++result;
+                }
+            }
+        }
+
+        return result;
+    }
+
     void refreshBoard() {
         for (int i = 0; i < boardSize; ++i) {
             for (int j = 0; j < boardSize; ++j) {
@@ -89,6 +105,15 @@ public class Game extends JFrame {
                 board[i][j].setActive(false);
                 board[i][j].refresh();
             }
+        }
+    }
+
+    void setTurnShower() {
+        JLabel turnText = (JLabel) background.getComponent(background.getComponents().length - 1);
+        if (!addingUnits) {
+            turnText.setText((turn == -1 ? "Blue's" : "Red's") + " turn.");
+        } else {
+            turnText.setText("Unit Count: " + unitSetCount);
         }
     }
 
@@ -111,7 +136,7 @@ public class Game extends JFrame {
     }
 
     boolean doubleClick(Object obj) {
-        return System.nanoTime() - lasClickTime < 300000000 && obj == lastClickedButton;
+        return System.nanoTime() - lasClickTime < 250000000 && obj == lastClickedButton;
     }
 
     void passTime(int millis) {

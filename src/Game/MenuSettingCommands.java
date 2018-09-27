@@ -24,7 +24,7 @@ class MenuSettingCommands {
         influence.setFont(new Font("SansSerif", Font.BOLD, 50));
         turnShower.setForeground(influence.getForeground());
         turnShower.setFont(buttonFont);
-        setTurnShower();
+        turnShower.setText((game.turn == -1 ? "Blue's" : "Red's") + " turn.");
     }
 
     void setMainMenu() {
@@ -242,10 +242,6 @@ class MenuSettingCommands {
         game.add(panel);
         game.setVisible(true);
     }
-//THIS DOESN'T WORK!!! (AND MANY OTHER THINGS TOO)
-    private void setTurnShower() {
-        turnShower.setText((game.turn == -1 ? "Blue's" : "Red's") + " turn.");
-    }
 
     private class StartListener implements ActionListener {
         @Override
@@ -409,21 +405,26 @@ class MenuSettingCommands {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (game.sound)
-                game.getClip("Sounds\\game over.wav").start();
+                game.getClip("Sounds\\button.wav").start();
             JOptionPane.showMessageDialog(null, "YOU LOST!");
             game.menuIndex = 0;
             game.start();
         }
     }
-
+//TURN IS NO BEING PASSED
     private class PassTurnListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (game.sound)
                 game.getClip("Sounds\\button.wav").start();
-            game.passTurnRefreshBoard();
-            setTurnShower();
-            game.turn *= -1;
+            if (game.addingUnits) {
+                game.turn *= -1;
+                game.passTurnRefreshBoard();
+            } else {
+                game.unitSetCount = game.countPlayerUnits();
+                game.addingUnits = true;
+            }
+            game.setTurnShower();
         }
     }
 }
