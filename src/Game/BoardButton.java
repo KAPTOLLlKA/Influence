@@ -250,7 +250,7 @@ class BoardButton extends JButton {
                 }
                 game.lasClickTime = System.nanoTime();
                 game.lastClickedButton = this;
-            } else if (game.unitSetCount > 0) {
+            } else if (game.unitSetCount > 0 && belongsTo == game.turn) {
                 addUnit();
                 --game.unitSetCount;
                 game.setTurnShower();
