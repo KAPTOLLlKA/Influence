@@ -191,7 +191,7 @@ class BoardButton extends JButton {
         public void actionPerformed(ActionEvent e) {
             if (!game.addingUnits) {
                 if (belongsTo == game.turn && game.doubleClick(this)) {
-                    if (hasEmptySides() && !waiting) {
+                    if (!waiting) {
                         if (!active && thereIsNoActive()) {
                             setActive(true);
                         } else if (!active && !thereIsNoActive()) {
@@ -200,7 +200,7 @@ class BoardButton extends JButton {
                         } else if (active) {
                             setActive(false);
                         }
-                    } else if (waiting) {
+                    } else {
                         if (!active) {
                             findActiveAndRemoveIt();
                             setActive(true);
@@ -239,7 +239,7 @@ class BoardButton extends JButton {
                             getActiveField().setUnitCount(1);
                             setUnitCount(1);
                         } else if (activeUnits < unitCount) {
-                            setUnitCount(unitCount - activeUnits + 1);
+                            setUnitCount(unitCount - activeUnits);
                             getActiveField().setUnitCount(1);
                         } else {
                             setBelonging(game.turn);
