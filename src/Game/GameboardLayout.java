@@ -43,7 +43,7 @@ class GameboardLayout implements LayoutManager {
                 y += buttonSize;
             }
         }
-        list[list.length - 2].setBounds(game.getWidth() - 165, 0, 150, 50);
-        list[list.length - 1].setBounds(game.getWidth() - 165, 100, 150, 50);
+        list[list.length - 2].setBounds(game.getWidth() - 167, game.getHeight() - 90, 150, 50);
+        list[list.length - 1].setBounds(game.getWidth() - 165, 0, 150, 50);
     }
 }

@@ -12,7 +12,7 @@ public class Game extends JFrame {
     Random rand = new Random();
 
     int boardSize = 0;
-    int turn = (rand.nextBoolean() ? -1 : 1);
+    int turn;
 
     Clip backgroundMusic = getClip("Sounds\\menu background.wav");
 
@@ -20,8 +20,8 @@ public class Game extends JFrame {
 
     final Color WALL = Color.BLACK;
     final Color EMPTY = Color.DARK_GRAY;
-    final Color P1OnePointColor = new Color(0, 115, 185);
-    final Color P2OnePointColor = new Color(115, 0, 0);
+    final Color P1OnePointColor = new Color(0, 155, 185);
+    final Color P2OnePointColor = new Color(155, 0, 0);
 
     private BackgroundPanel background = new BackgroundPanel();
     private MenuSettingCommands menus = new MenuSettingCommands(this, background);
@@ -31,7 +31,6 @@ public class Game extends JFrame {
 
     boolean fullscreen = false;
     boolean sound = true;
-    boolean playerPlayer = false;
     boolean backgroundMusicPlaying = false;
     boolean addingUnits = false;
 
@@ -40,7 +39,6 @@ public class Game extends JFrame {
 
     int menuIndex = 0;
     int unitSetCount;
-    boolean easy = false;
 
     public Game() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -64,12 +62,9 @@ public class Game extends JFrame {
         } else if (menuIndex == 1) {
             menus.setSettingsMenu();
         } else if (menuIndex == 2) {
-            menus.setPlayerModeMenu();
-        } else if (menuIndex == 3) {
-            menus.setDifficultyModeMenu();
-        } else if (menuIndex == 4) {
             menus.setBoardSizeMenu();
-        } else if (menuIndex == 5) {
+        } else if (menuIndex == 3) {
+            turn = (rand.nextBoolean() ? -1 : 1);
             menus.setGameStart();
         }
         setVisible(true);
@@ -108,6 +103,20 @@ public class Game extends JFrame {
         }
     }
 
+    boolean checkWin() {
+        int k = 0;
+
+        for (int i = 0; i < boardSize; ++i) {
+            for (int j = 0; j < boardSize; ++j) {
+                if (board[i][j].getBelonging() == turn * -1) {
+                    ++k;
+                }
+            }
+        }
+
+        return k == 0;
+    }
+
     void setTurnShower() {
         JLabel turnText = (JLabel) background.getComponent(background.getComponents().length - 1);
         JButton surrenderButton = (JButton) background.getComponent(background.getComponents().length - 2);
@@ -140,14 +149,6 @@ public class Game extends JFrame {
 
     boolean doubleClick(Object obj) {
         return System.nanoTime() - lasClickTime < 250000000 && obj == lastClickedButton;
-    }
-
-    void passTime(int millis) {
-        try {
-            Thread.sleep(millis);
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
-        }
     }
 
     private class BackgroundPanel extends JPanel {

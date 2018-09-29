@@ -26,7 +26,6 @@ class MenuSettingCommands {
         influence.setFont(new Font("SansSerif", Font.BOLD, 50));
         turnShower.setForeground(influence.getForeground());
         turnShower.setFont(buttonFont);
-        turnShower.setText((game.turn == -1 ? "Blue's" : "Red's") + " turn.");
     }
 
     void setMainMenu() {
@@ -96,74 +95,6 @@ class MenuSettingCommands {
         game.add(panel);
     }
 
-    void setPlayerModeMenu() {
-        game.getContentPane().removeAll();
-        panel.removeAll();
-
-        panel.setLayout(new CentralLayout(game));
-
-        JButton plVsPl = new JButton("Player vs Player");
-        JButton plVsAi = new JButton("Player vs AI");
-        JButton back = new JButton("Back");
-
-        plVsPl.setForeground(Color.BLACK);
-        plVsAi.setForeground(Color.BLACK);
-        back.setForeground(Color.BLACK);
-
-        plVsPl.setBackground(buttonColor);
-        plVsAi.setBackground(buttonColor);
-        back.setBackground(buttonColor);
-
-        plVsPl.setFont(buttonFont);
-        plVsAi.setFont(buttonFont);
-        back.setFont(buttonFont);
-
-        plVsPl.addActionListener(new PlVsPlListener());
-        plVsAi.addActionListener(new PlVsAiListener());
-        back.addActionListener(new BackListener(0));
-
-        panel.add(influence);
-        panel.add(plVsPl);
-        panel.add(plVsAi);
-        panel.add(back);
-
-        game.add(panel);
-    }
-
-    void setDifficultyModeMenu() {
-        game.getContentPane().removeAll();
-        panel.removeAll();
-
-        panel.setLayout(new CentralLayout(game));
-
-        JButton easy = new JButton("Easy");
-        JButton hard = new JButton("Hard");
-        JButton back = new JButton("Back");
-
-        easy.setForeground(Color.BLACK);
-        hard.setForeground(Color.BLACK);
-        back.setForeground(Color.BLACK);
-
-        easy.setBackground(buttonColor);
-        hard.setBackground(buttonColor);
-        back.setBackground(buttonColor);
-
-        easy.setFont(buttonFont);
-        hard.setFont(buttonFont);
-        back.setFont(buttonFont);
-
-        easy.addActionListener(new EasyHardListener(true));
-        hard.addActionListener(new EasyHardListener(false));
-        back.addActionListener(new BackListener(2));
-
-        panel.add(influence);
-        panel.add(easy);
-        panel.add(hard);
-        panel.add(back);
-
-        game.add(panel);
-    }
-
     void setBoardSizeMenu() {
         game.getContentPane().removeAll();
         panel.removeAll();
@@ -189,10 +120,7 @@ class MenuSettingCommands {
         back.setFont(buttonFont);
 
         start.addActionListener(new StartGameListener());
-        if (game.playerPlayer)
-            back.addActionListener(new BackListener(2));
-        else
-            back.addActionListener(new BackListener(3));
+        back.addActionListener(new BackListener(0));
 
         panel.add(size);
         panel.add(sizeField);
@@ -209,6 +137,8 @@ class MenuSettingCommands {
         panel.setLayout(new GameboardLayout(game));
 
         JButton surrender = new JButton("Surrender");
+
+        turnShower.setText((game.turn == -1 ? "Blue's" : "Red's") + " turn.");
 
         surrender.setForeground(Color.BLACK);
         passTurn.setForeground(Color.BLACK);
@@ -333,42 +263,6 @@ class MenuSettingCommands {
         }
     }
 
-    private class PlVsPlListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (game.sound)
-                game.getClip("Sounds\\button.wav").start();
-            game.menuIndex = 4;
-            game.playerPlayer = true;
-            game.start();
-        }
-    }
-
-    private class PlVsAiListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (game.sound)
-                game.getClip("Sounds\\button.wav").start();
-            game.menuIndex = 3;
-            game.playerPlayer = false;
-            game.start();
-        }
-    }
-
-    private class EasyHardListener implements ActionListener {
-        EasyHardListener(boolean easy) {
-            game.easy = easy;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (game.sound)
-                game.getClip("Sounds\\button.wav").start();
-            game.menuIndex = 4;
-            game.start();
-        }
-    }
-
     private class StartGameListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -391,7 +285,7 @@ class MenuSettingCommands {
                     if (game.sound)
                         game.getClip("Sounds\\button.wav").start();
                 } else {
-                    game.menuIndex = 5;
+                    game.menuIndex = 3;
                     game.start();
                 }
             } catch (Exception ex) {
@@ -407,7 +301,7 @@ class MenuSettingCommands {
         public void actionPerformed(ActionEvent e) {
             if (game.sound)
                 game.getClip("Sounds\\button.wav").start();
-            JOptionPane.showMessageDialog(null, "YOU LOST!");
+            JOptionPane.showMessageDialog(null, (game.turn == -1 ? "Blues" : "Reds") + " lost!");
             game.menuIndex = 0;
             game.start();
         }
@@ -420,12 +314,12 @@ class MenuSettingCommands {
                 game.getClip("Sounds\\button.wav").start();
             if (game.addingUnits) {
                 game.turn *= -1;
-                game.passTurnRefreshBoard();
                 game.addingUnits = false;
             } else {
                 game.unitSetCount = game.countPlayerUnits();
                 game.addingUnits = true;
             }
+            game.passTurnRefreshBoard();
             game.setTurnShower();
         }
     }

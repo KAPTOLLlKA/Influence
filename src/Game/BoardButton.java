@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseListener;
 
 class BoardButton extends JButton {
     private int belongsTo;
@@ -23,10 +22,17 @@ class BoardButton extends JButton {
         belongsTo = BelongsTo;
         x = X;
         y = Y;
-        if (belongsTo == 0)
+        if (belongsTo == 0) {
             setBackground(game.rand.nextInt(100) < 15 && canPutHere() ? game.WALL : game.EMPTY);
-        else
-            unitCount = 2;
+        } else {
+            int units = 2;
+            if (game.boardSize >= 8 && game.boardSize <= 12)
+                units = 4;
+            else if (game.boardSize >= 13 && game.boardSize <= 15)
+                units = 6;
+
+            unitCount = units;
+        }
         addActionListener(new ClickListener());
         refresh();
     }
@@ -55,34 +61,18 @@ class BoardButton extends JButton {
             ++unitCount;
     }
 
-    private boolean decreaseUnit() {
-        if (unitCount > 1) {
-            --unitCount;
-            return true;
-        }
-        return false;
-    }
-
     void refresh() {
         if (getBackground() != game.WALL) {
             if (belongsTo == -1)
-                setBackground(doP1Brighter(game.P1OnePointColor, unitCount));
+                setBackground(game.P1OnePointColor);
             else if (belongsTo == 1)
-                setBackground(doP2Brighter(game.P2OnePointColor, unitCount));
+                setBackground(game.P2OnePointColor);
             if (active)
                 setBackground(getBackground().brighter());
             setText(unitCount == 0 ? "" : "" + unitCount);
             setForeground(Color.BLACK);
         } else
             setEnabled(false);
-    }
-
-    private Color doP1Brighter(Color color, int k) {
-        return new Color(0, color.getGreen() + (k - 1) * 20, color.getBlue() + (k - 1) * 10);
-    }
-
-    private Color doP2Brighter(Color color, int k) {
-        return new Color(color.getRed() + (k - 1) * 20, 0, 0);
     }
 
     private boolean thereIsNoActive() {
@@ -109,10 +99,6 @@ class BoardButton extends JButton {
         return getActiveField().getUnitCount();
     }
 
-    private boolean findActiveDecreaseHisUnitAndRefreshIt() {
-        return getActiveField().decreaseUnit();
-    }
-
     private void findActiveAndRemoveIt() {
         for (int i = 0; i < game.boardSize; ++i) {
             for (int j = 0; j < game.boardSize; ++j) {
@@ -122,30 +108,11 @@ class BoardButton extends JButton {
         }
     }
 
-    private boolean hasEmptySides() {
-        boolean result = false;
-
-        if (x > 0 && game.board[x - 1][y].getBackground() == game.EMPTY)
-            result = true;
-        else if (y > 0 && game.board[x][y - 1].getBackground() == game.EMPTY)
-            result = true;
-        else if (x < game.boardSize - 1 && game.board[x + 1][y].getBackground() == game.EMPTY)
-            result = true;
-        else if (y < game.boardSize - 1 && game.board[x][y + 1].getBackground() == game.EMPTY)
-            result = true;
-
-        return result;
-    }
-
-    boolean getActive() {
+    private boolean getActive() {
         return active;
     }
 
-    boolean getWaiting() {
-        return waiting;
-    }
-
-    int getUnitCount() {
+    private int getUnitCount() {
         return unitCount;
     }
 
@@ -190,14 +157,14 @@ class BoardButton extends JButton {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (!game.addingUnits) {
-                if (belongsTo == game.turn && game.doubleClick(this)) {
+                if (belongsTo == game.turn && game.doubleClick(this) && unitCount > 1) {
                     if (!waiting) {
                         if (!active && thereIsNoActive()) {
                             setActive(true);
-                        } else if (!active && !thereIsNoActive()) {
+                        } else if (!active) {
                             findActiveAndRemoveIt();
                             setActive(true);
-                        } else if (active) {
+                        } else {
                             setActive(false);
                         }
                     } else {
@@ -207,50 +174,69 @@ class BoardButton extends JButton {
                         } else
                             setActive(false);
                     }
-                } else if (waiting && !thereIsNoActive()) {
-                    if (belongsTo != game.turn * -1) {
-                        if (findActiveDecreaseHisUnitAndRefreshIt()) {
-                            addUnit();
-                            setBelonging(game.turn);
-                        }
-                    } else {
-                        int activeUnits = getActiveFieldUnits();
+                } else if (waiting && !thereIsNoActive() && getActiveFieldUnits() > 1) {
+                    if (belongsTo == 0) {
+                        setUnitCount(getActiveFieldUnits() - 1);
+                        getActiveField().setUnitCount(1);
+                        findActiveAndRemoveIt();
+                        setActive(true);
+                        setBelonging(game.turn);
+                    } else if (belongsTo == game.turn * -1) {
+                        int activeFieldUnits = getActiveFieldUnits();
                         int decision;
 
-                        if (activeUnits == unitCount) {
+                        if (activeFieldUnits == unitCount) {
                             decision = game.rand.nextInt(2);
+
                             if (decision == 0) {
                                 setBelonging(game.turn);
+                                findActiveAndRemoveIt();
+                                setActive(true);
                             }
                             getActiveField().setUnitCount(1);
                             setUnitCount(1);
-                        } else if (activeUnits == unitCount + 1) {
+                        } else if (activeFieldUnits == unitCount + 1) {
                             decision = game.rand.nextInt(4);
+
                             if (decision != 0) {
                                 setBelonging(game.turn);
+                                getActiveField().setUnitCount(1);
+                                findActiveAndRemoveIt();
+                                setActive(true);
                             }
                             getActiveField().setUnitCount(1);
                             setUnitCount(1);
-                        } else if (activeUnits == unitCount - 1) {
+                        } else if (activeFieldUnits == unitCount - 1) {
                             decision = game.rand.nextInt(4);
+
                             if (decision == 0) {
                                 setBelonging(game.turn);
+                                findActiveAndRemoveIt();
+                                setActive(true);
                             }
                             getActiveField().setUnitCount(1);
                             setUnitCount(1);
-                        } else if (activeUnits < unitCount) {
-                            setUnitCount(unitCount - activeUnits);
+                        } else if (activeFieldUnits < unitCount) {
+                            setUnitCount(unitCount - activeFieldUnits);
                             getActiveField().setUnitCount(1);
                         } else {
-                            setBelonging(game.turn);
-                            setUnitCount(activeUnits - unitCount);
+                            setUnitCount(activeFieldUnits - unitCount);
                             getActiveField().setUnitCount(1);
+                            setBelonging(game.turn);
+                            findActiveAndRemoveIt();
+                            setActive(true);
                         }
                     }
                 }
                 game.lasClickTime = System.nanoTime();
                 game.lastClickedButton = this;
-            } else if (game.unitSetCount > 0 && belongsTo == game.turn) {
+                if (game.checkWin()) {
+                    game.refreshBoard();
+                    game.menuIndex = 0;
+                    JOptionPane.showMessageDialog(null, (game.turn == -1 ? "Reds" : "Blues") + " lost!");
+                    game.start();
+                }
+            } else if (game.unitSetCount > 0 && belongsTo == game.turn && unitCount < 8) {
                 addUnit();
                 --game.unitSetCount;
                 game.setTurnShower();
