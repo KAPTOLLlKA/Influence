@@ -66,6 +66,8 @@ public class Game extends JFrame {
         } else if (menuIndex == 3) {
             turn = (rand.nextBoolean() ? -1 : 1);
             menus.setGameStart();
+        } else if (menuIndex == 4) {
+            menus.setHowToPlayMenu();
         }
         setVisible(true);
         menuIndex = -1;

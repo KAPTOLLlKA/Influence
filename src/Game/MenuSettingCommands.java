@@ -18,11 +18,13 @@ class MenuSettingCommands {
 
     private final Font buttonFont = new Font("SansSerif", Font.BOLD, 20);
 
+    private final Color textColor = new Color(200, 100, 0);
+
     MenuSettingCommands(Game game, JPanel panel) {
         this.game = game;
         this.panel = panel;
         influence = new JLabel("Influence");
-        influence.setForeground(new Color(200, 100, 0));
+        influence.setForeground(textColor);
         influence.setFont(new Font("SansSerif", Font.BOLD, 50));
         turnShower.setForeground(influence.getForeground());
         turnShower.setFont(buttonFont);
@@ -35,27 +37,33 @@ class MenuSettingCommands {
         panel.setLayout(new CentralLayout(game));
         JButton startGame = new JButton("Start Game");
         JButton settings = new JButton("Settings");
+        JButton howToPlay = new JButton("How To Play");
         JButton exit = new JButton("Exit");
 
         startGame.setForeground(Color.BLACK);
         settings.setForeground(Color.BLACK);
+        howToPlay.setForeground(Color.BLACK);
         exit.setForeground(Color.BLACK);
 
         startGame.setBackground(buttonColor);
         settings.setBackground(buttonColor);
+        howToPlay.setBackground(buttonColor);
         exit.setBackground(buttonColor);
 
         startGame.setFont(buttonFont);
         settings.setFont(buttonFont);
+        howToPlay.setFont(buttonFont);
         exit.setFont(buttonFont);
 
         startGame.addActionListener(new StartListener());
         settings.addActionListener(new SettingsListener());
+        howToPlay.addActionListener(new HowToPlayListener());
         exit.addActionListener(new ExitListener());
 
         panel.add(influence);
         panel.add(startGame);
         panel.add(settings);
+        panel.add(howToPlay);
         panel.add(exit);
 
         game.add(panel);
@@ -174,6 +182,79 @@ class MenuSettingCommands {
         game.setVisible(true);
     }
 
+    void setHowToPlayMenu() {
+        game.getContentPane().removeAll();
+        panel.removeAll();
+
+        panel.setLayout(new HowToPlayLayout(game));
+
+        JButton back = new JButton("Back");
+        JLabel howTo1 = new JLabel("Your goal is to conquer all of the enemy's fields.");
+        JLabel howTo2 = new JLabel("On your turn you first conquer fields, then add new units to already conquered ones.");
+        JLabel howTo3 = new JLabel("On one field there are maximum 8 units.");
+        JLabel howTo4 = new JLabel("You can attack/conquer only with fields, that have 2 or more units in them.");
+        JLabel howTo5 = new JLabel("To choose field which you want to play from, double click on it.");
+        JLabel howTo6 = new JLabel("Black fields are walls (they're set randomly).");
+        JLabel howTo7 = new JLabel("When attacking enemy, there are few rules:");
+        JLabel howTo8 = new JLabel("1.If defending field has equal units to attacking one, then you have 50% chance to conquer it.");
+        JLabel howTo9 = new JLabel("2.If defending unit has one less unit, than attacking one, then you have 75% chance to conquer it.");
+        JLabel howTo10 = new JLabel("3.If defending unit has one more unit than attacking field, then you still have 25% chance to conquer it.");
+        JLabel howTo11 = new JLabel("4.If difference is more than 2, then wins field with more units.");
+        JLabel howTo12 = new JLabel("");
+        JLabel howTo13 = new JLabel("That's all, go and fight! :)");
+
+        back.setForeground(Color.BLACK);
+        howTo1.setForeground(textColor);
+        howTo2.setForeground(textColor);
+        howTo3.setForeground(textColor);
+        howTo4.setForeground(textColor);
+        howTo5.setForeground(textColor);
+        howTo6.setForeground(textColor);
+        howTo7.setForeground(textColor);
+        howTo8.setForeground(textColor);
+        howTo9.setForeground(textColor);
+        howTo10.setForeground(textColor);
+        howTo11.setForeground(textColor);
+        howTo12.setForeground(textColor);
+        howTo13.setForeground(textColor);
+
+        back.setBackground(buttonColor);
+
+        back.setFont(buttonFont);
+        howTo1.setFont(buttonFont);
+        howTo2.setFont(buttonFont);
+        howTo3.setFont(buttonFont);
+        howTo4.setFont(buttonFont);
+        howTo5.setFont(buttonFont);
+        howTo6.setFont(buttonFont);
+        howTo7.setFont(buttonFont);
+        howTo8.setFont(buttonFont);
+        howTo9.setFont(buttonFont);
+        howTo10.setFont(buttonFont);
+        howTo11.setFont(buttonFont);
+        howTo12.setFont(buttonFont);
+        howTo13.setFont(buttonFont);
+
+        back.addActionListener(new BackListener(0));
+
+        panel.add(back);
+        panel.add(howTo1);
+        panel.add(howTo2);
+        panel.add(howTo3);
+        panel.add(howTo4);
+        panel.add(howTo5);
+        panel.add(howTo6);
+        panel.add(howTo7);
+        panel.add(howTo8);
+        panel.add(howTo9);
+        panel.add(howTo10);
+        panel.add(howTo11);
+        panel.add(howTo12);
+        panel.add(howTo13);
+
+        game.add(panel);
+    }
+
     private class StartListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -190,6 +271,16 @@ class MenuSettingCommands {
             if (game.sound)
                 game.getClip("Sounds\\button.wav").start();
             game.menuIndex = 1;
+            game.start();
+        }
+    }
+
+    private class HowToPlayListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (game.sound)
+                game.getClip("Sounds\\button.wav").start();
+            game.menuIndex = 4;
             game.start();
         }
     }
