@@ -14,16 +14,18 @@ public class Game extends JFrame {
     int boardSize;
     int turn;
 
+    AiLogics ai = new AiLogics(this);
+
     Clip backgroundMusic = getClip("Sounds\\menu background.wav");
 
     BoardButton[][] board;
 
     final Color WALL = Color.BLACK;
     final Color EMPTY = Color.DARK_GRAY;
-    final Color P1Color = new Color(0, 155, 185);
-    final Color P2Color = new Color(155, 0, 0);
-    final Color P3Color = new Color(0, 155, 185);
-    final Color P4Color = new Color(155, 0, 0);
+    final Color P1Color = new Color(0, 170, 200);
+    final Color P2Color = new Color(175, 0, 0);
+    final Color P3Color = new Color(0, 175, 0);
+    final Color P4Color = new Color(180, 120, 0);
 
     private BackgroundPanel background = new BackgroundPanel();
     private MenuSettingCommands menus = new MenuSettingCommands(this, background);
@@ -41,7 +43,10 @@ public class Game extends JFrame {
 
     int menuIndex = 0;
     int unitSetCount;
-    int playerMode;
+    int p1Mode = 1;
+    int p2Mode = 2;
+    int p3Mode = 0;
+    int p4Mode = 0;
 
     public Game() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -69,7 +74,14 @@ public class Game extends JFrame {
         } else if (menuIndex == 3) {
             menus.setBoardSizeMenu();
         } else if (menuIndex == 4) {
-            turn = (rand.nextBoolean() ? -1 : 1);
+            int playerCount = 2;
+            if (p3Mode != 0) {
+                ++playerCount;
+            }
+            if (p4Mode != 0) {
+                ++playerCount;
+            }
+            turn = (rand.nextInt(playerCount));
             menus.setGameStart();
         } else if (menuIndex == 5) {
             menus.setHowToPlayMenu();
@@ -110,25 +122,91 @@ public class Game extends JFrame {
         }
     }
 
-    boolean checkWin() {
-        int k = 0;
+    int checkWin() {
+        int p1 = 0;
+        int p2 = 0;
+        int p3 = 0;
+        int p4 = 0;
 
         for (int i = 0; i < boardSize; ++i) {
             for (int j = 0; j < boardSize; ++j) {
-                if (board[i][j].getBelonging() == turn * -1) {
-                    ++k;
+                if (board[i][j].getBelonging() == 0) {
+                    ++p1;
+                } else if (board[i][j].getBelonging() == 1) {
+                    ++p2;
+                } else if (board[i][j].getBelonging() == 2) {
+                    ++p3;
+                } else if (board[i][j].getBelonging() == 3) {
+                    ++p4;
                 }
             }
         }
 
-        return k == 0;
+        int result = -1;
+        int sum = p1 + p2 + p3 + p4;
+        if (sum == p1)
+            result = 0;
+        if (sum == p2)
+            result = 1;
+        if (sum == p3)
+            result = 2;
+        if (sum == p4)
+            result = 3;
+
+        return result;
+    }
+
+    void setPlayerModeTexts() {
+        JButton p1Button = (JButton) background.getComponent(0);
+        JButton p2Button = (JButton) background.getComponent(1);
+        JButton p3Button = (JButton) background.getComponent(2);
+        JButton p4Button = (JButton) background.getComponent(3);
+
+        if (p1Mode == 1) {
+            p1Button.setText("Player");
+        } else if (p1Mode == 2) {
+            p1Button.setText("AI");
+        }
+
+        if (p2Mode == 1) {
+            p2Button.setText("Player");
+        } else if (p2Mode == 2) {
+            p2Button.setText("AI");
+        }
+
+        if (p3Mode == 0) {
+            p3Button.setText("None");
+        } else if (p3Mode == 1) {
+            p3Button.setText("Player");
+        } else if (p3Mode == 2) {
+            p3Button.setText("AI");
+        }
+
+        if (p4Mode == 0) {
+            p4Button.setText("None");
+        } else if (p4Mode == 1) {
+            p4Button.setText("Player");
+        } else if (p4Mode == 2) {
+            p4Button.setText("AI");
+        }
     }
 
     void setTurnShower() {
         JLabel turnText = (JLabel) background.getComponent(background.getComponents().length - 1);
         JButton surrenderButton = (JButton) background.getComponent(background.getComponents().length - 2);
         if (!addingUnits) {
-            turnText.setText((turn == -1 ? "Blue's" : "Red's") + " turn.");
+            String text = null;
+
+            if (turn == 0) {
+                text = "Blue's";
+            } else if (turn == 1) {
+                text = "Red's";
+            } else if (turn == 2) {
+                text = "Green's";
+            } else if (turn == 3) {
+                text = "Orange's";
+            }
+            turnText.setText(text + " turn.");
             surrenderButton.setText("Add Units");
         } else {
             turnText.setText(unitSetCount > 0 ? "Unit Count: " + unitSetCount : "Pass Turn!");

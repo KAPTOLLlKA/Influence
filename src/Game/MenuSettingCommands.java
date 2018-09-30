@@ -107,31 +107,48 @@ class MenuSettingCommands {
         game.getContentPane().removeAll();
         panel.removeAll();
 
-        panel.setLayout(new CentralLayout(game));
+        panel.setLayout(new CentralPlayerModeLayout(game));
 
-        JButton PlayerVsPlayer = new JButton("Player vs Player");
-        JButton PlayerVsAI = new JButton("Player vs AI");
+        JButton P1 = new JButton("Player");
+        JButton P2 = new JButton("AI");
+        JButton P3 = new JButton("None");
+        JButton P4 = new JButton("None");
+        JButton next = new JButton("Next");
         JButton back = new JButton("Back");
 
-        PlayerVsPlayer.setForeground(Color.BLACK);
-        PlayerVsAI.setForeground(Color.BLACK);
+        P1.setForeground(Color.BLACK);
+        P2.setForeground(Color.BLACK);
+        P3.setForeground(Color.BLACK);
+        P4.setForeground(Color.BLACK);
+        next.setForeground(Color.BLACK);
         back.setForeground(Color.BLACK);
 
-        PlayerVsPlayer.setBackground(buttonColor);
-        PlayerVsAI.setBackground(buttonColor);
+        P1.setBackground(game.P1Color);
+        P2.setBackground(game.P2Color);
+        P3.setBackground(game.P3Color);
+        P4.setBackground(game.P4Color);
+        next.setBackground(buttonColor);
         back.setBackground(buttonColor);
 
-        PlayerVsPlayer.setFont(buttonFont);
-        PlayerVsAI.setFont(buttonFont);
+        P1.setFont(buttonFont);
+        P2.setFont(buttonFont);
+        P3.setFont(buttonFont);
+        P4.setFont(buttonFont);
+        next.setFont(buttonFont);
         back.setFont(buttonFont);
 
-        PlayerVsPlayer.addActionListener(new PlayerModeListener(0));
-        PlayerVsAI.addActionListener(new PlayerModeListener(1));
+        P1.addActionListener(new PlayerModeListener(0));
+        P2.addActionListener(new PlayerModeListener(1));
+        P3.addActionListener(new PlayerModeListener(2));
+        P4.addActionListener(new PlayerModeListener(3));
+        next.addActionListener(new ToBoardSizeMenuListener());
         back.addActionListener(new BackListener(0));
 
-        panel.add(influence);
-        panel.add(PlayerVsPlayer);
-        panel.add(PlayerVsAI);
+        panel.add(P1);
+        panel.add(P2);
+        panel.add(P3);
+        panel.add(P4);
+        panel.add(next);
         panel.add(back);
 
         game.add(panel);
@@ -180,7 +197,17 @@ class MenuSettingCommands {
 
         JButton surrender = new JButton("Surrender");
 
-        turnShower.setText((game.turn == -1 ? "Blue's" : "Red's") + " turn.");
+        String text = null;
+        if (game.turn == 0) {
+            text = "Blue's";
+        } else if (game.turn == 1) {
+            text = "Red's";
+        } else if (game.turn == 2) {
+            text = "Green's";
+        } else if (game.turn == 3) {
+            text = "Orange's";
+        }
+        turnShower.setText(text + " turn.");
 
         surrender.setForeground(Color.BLACK);
         passTurn.setForeground(Color.BLACK);
@@ -224,7 +251,7 @@ class MenuSettingCommands {
 
         JButton back = new JButton("Back");
         JLabel[] howTo = new JLabel[13];
-        howTo[0] = new JLabel("Your goal is to conquer all of the enemy's fields.");
+        howTo[0] = new JLabel("Your goal is to conquer all of the enemies' fields.");
         howTo[1] = new JLabel("On your turn you first conquer fields, then add new units to already conquered ones.");
         howTo[2] = new JLabel("On one field there are maximum 8 units.");
         howTo[3] = new JLabel("You can attack/conquer only with fields, that have 2 or more units in them and at least one side that is empty or belongs to enemy.");
@@ -356,21 +383,50 @@ class MenuSettingCommands {
     }
 
     private class PlayerModeListener implements ActionListener {
-        private int playerMode;
+        private int player;
 
-        /**
-         * if playerMode is 0, than it's 2 player mode, either, player vs AI. (just yet)
-         * @param playerMode
-         */
-        PlayerModeListener(int playerMode) {
-            this.playerMode = playerMode;
+        PlayerModeListener(int player) {
+            this.player = player;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             if (game.sound)
                 game.getClip("Sounds\\button.wav").start();
-            game.playerMode = playerMode;
+            if (player == 0) {
+                ++game.p1Mode;
+                if (game.p1Mode > 2) {
+                    game.p1Mode = 1;
+                }
+            } else if (player == 1) {
+                ++game.p2Mode;
+                if (game.p2Mode > 2) {
+                    game.p2Mode = 1;
+                }
+            } else if (player == 2) {
+                ++game.p3Mode;
+                if (game.p3Mode > 2) {
+                    game.p3Mode = 0;
+                    game.p4Mode = 0;
+                }
+            } else if (player == 3) {
+                ++game.p4Mode;
+                if (game.p3Mode == 0) {
+                    game.p4Mode = 0;
+                }
+                else if (game.p4Mode > 2) {
+                    game.p4Mode = 0;
+                }
+            }
+            game.setPlayerModeTexts();
+        }
+    }
+
+    private class ToBoardSizeMenuListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (game.sound)
+                game.getClip("Sounds\\button.wav").start();
             game.menuIndex = 3;
             game.start();
         }

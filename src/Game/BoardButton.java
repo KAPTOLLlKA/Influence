@@ -22,7 +22,7 @@ class BoardButton extends JButton {
         belongsTo = BelongsTo;
         x = X;
         y = Y;
-        if (belongsTo == 0) {
+        if (belongsTo == -1) {
             setBackground(game.rand.nextInt(100) < 15 && canPutHere() ? game.WALL : game.EMPTY);
         } else {
             int units = 2;
@@ -71,6 +71,7 @@ class BoardButton extends JButton {
                 setBackground(getBackground().brighter());
             setText(unitCount == 0 ? "" : "" + unitCount);
             setForeground(Color.BLACK);
+            game.ai.addField(x, y);
         } else
             setEnabled(false);
     }
@@ -167,7 +168,7 @@ class BoardButton extends JButton {
 
         return result;
     }
-//Make AI and add sounds
+
     private class ClickListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -250,10 +251,24 @@ class BoardButton extends JButton {
                 }
                 game.lasClickTime = System.nanoTime();
                 game.lastClickedButton = this;
-                if (game.checkWin()) {
+                int winner = game.checkWin();
+                if (winner != -1) {
                     game.refreshBoard();
                     game.menuIndex = 0;
-                    JOptionPane.showMessageDialog(null, (game.turn == -1 ? "Blues" : "Reds") + " won!");
+
+                    String text = null;
+                    if (winner == 0) {
+                        text = "Blues";
+                    } else if (winner == 1) {
+                        text = "Reds";
+                    } else if (winner == 2) {
+                        text = "Greens";
+                    }
+                    else if (winner == 3) {
+                        text = "Oranges";
+                    }
+
+                    JOptionPane.showMessageDialog(null, (text + " won!"));
                     game.start();
                 }
             } else if (game.unitSetCount > 0 && belongsTo == game.turn && unitCount < 8) {
