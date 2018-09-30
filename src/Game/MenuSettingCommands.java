@@ -103,6 +103,40 @@ class MenuSettingCommands {
         game.add(panel);
     }
 
+    void setPlayerModeMenu() {
+        game.getContentPane().removeAll();
+        panel.removeAll();
+
+        panel.setLayout(new CentralLayout(game));
+
+        JButton PlayerVsPlayer = new JButton("Player vs Player");
+        JButton PlayerVsAI = new JButton("Player vs AI");
+        JButton back = new JButton("Back");
+
+        PlayerVsPlayer.setForeground(Color.BLACK);
+        PlayerVsAI.setForeground(Color.BLACK);
+        back.setForeground(Color.BLACK);
+
+        PlayerVsPlayer.setBackground(buttonColor);
+        PlayerVsAI.setBackground(buttonColor);
+        back.setBackground(buttonColor);
+
+        PlayerVsPlayer.setFont(buttonFont);
+        PlayerVsAI.setFont(buttonFont);
+        back.setFont(buttonFont);
+
+        PlayerVsPlayer.addActionListener(new PlayerModeListener(0));
+        PlayerVsAI.addActionListener(new PlayerModeListener(1));
+        back.addActionListener(new BackListener(0));
+
+        panel.add(influence);
+        panel.add(PlayerVsPlayer);
+        panel.add(PlayerVsAI);
+        panel.add(back);
+
+        game.add(panel);
+    }
+
     void setBoardSizeMenu() {
         game.getContentPane().removeAll();
         panel.removeAll();
@@ -128,7 +162,7 @@ class MenuSettingCommands {
         back.setFont(buttonFont);
 
         start.addActionListener(new StartGameListener());
-        back.addActionListener(new BackListener(0));
+        back.addActionListener(new BackListener(2));
 
         panel.add(size);
         panel.add(sizeField);
@@ -247,7 +281,7 @@ class MenuSettingCommands {
         public void actionPerformed(ActionEvent e) {
             if (game.sound)
                 game.getClip("Sounds\\button.wav").start();
-            game.menuIndex = 4;
+            game.menuIndex = 5;
             game.start();
         }
     }
@@ -321,6 +355,27 @@ class MenuSettingCommands {
         }
     }
 
+    private class PlayerModeListener implements ActionListener {
+        private int playerMode;
+
+        /**
+         * if playerMode is 0, than it's 2 player mode, either, player vs AI. (just yet)
+         * @param playerMode
+         */
+        PlayerModeListener(int playerMode) {
+            this.playerMode = playerMode;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (game.sound)
+                game.getClip("Sounds\\button.wav").start();
+            game.playerMode = playerMode;
+            game.menuIndex = 3;
+            game.start();
+        }
+    }
+
     private class StartGameListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -343,7 +398,7 @@ class MenuSettingCommands {
                     if (game.sound)
                         game.getClip("Sounds\\button.wav").start();
                 } else {
-                    game.menuIndex = 3;
+                    game.menuIndex = 4;
                     game.start();
                 }
             } catch (Exception ex) {

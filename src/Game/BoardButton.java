@@ -64,9 +64,9 @@ class BoardButton extends JButton {
     void refresh() {
         if (getBackground() != game.WALL) {
             if (belongsTo == -1)
-                setBackground(game.P1OnePointColor);
+                setBackground(game.P1Color);
             else if (belongsTo == 1)
-                setBackground(game.P2OnePointColor);
+                setBackground(game.P2Color);
             if (active)
                 setBackground(getBackground().brighter());
             setText(unitCount == 0 ? "" : "" + unitCount);
@@ -167,7 +167,7 @@ class BoardButton extends JButton {
 
         return result;
     }
-
+//Make AI and add sounds
     private class ClickListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {

@@ -11,7 +11,7 @@ import java.util.Random;
 public class Game extends JFrame {
     Random rand = new Random();
 
-    int boardSize = 0;
+    int boardSize;
     int turn;
 
     Clip backgroundMusic = getClip("Sounds\\menu background.wav");
@@ -20,8 +20,10 @@ public class Game extends JFrame {
 
     final Color WALL = Color.BLACK;
     final Color EMPTY = Color.DARK_GRAY;
-    final Color P1OnePointColor = new Color(0, 155, 185);
-    final Color P2OnePointColor = new Color(155, 0, 0);
+    final Color P1Color = new Color(0, 155, 185);
+    final Color P2Color = new Color(155, 0, 0);
+    final Color P3Color = new Color(0, 155, 185);
+    final Color P4Color = new Color(155, 0, 0);
 
     private BackgroundPanel background = new BackgroundPanel();
     private MenuSettingCommands menus = new MenuSettingCommands(this, background);
@@ -39,6 +41,7 @@ public class Game extends JFrame {
 
     int menuIndex = 0;
     int unitSetCount;
+    int playerMode;
 
     public Game() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -62,11 +65,13 @@ public class Game extends JFrame {
         } else if (menuIndex == 1) {
             menus.setSettingsMenu();
         } else if (menuIndex == 2) {
-            menus.setBoardSizeMenu();
+            menus.setPlayerModeMenu();
         } else if (menuIndex == 3) {
+            menus.setBoardSizeMenu();
+        } else if (menuIndex == 4) {
             turn = (rand.nextBoolean() ? -1 : 1);
             menus.setGameStart();
-        } else if (menuIndex == 4) {
+        } else if (menuIndex == 5) {
             menus.setHowToPlayMenu();
         }
         setVisible(true);
