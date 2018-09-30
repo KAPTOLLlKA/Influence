@@ -189,68 +189,35 @@ class MenuSettingCommands {
         panel.setLayout(new HowToPlayLayout(game));
 
         JButton back = new JButton("Back");
-        JLabel howTo1 = new JLabel("Your goal is to conquer all of the enemy's fields.");
-        JLabel howTo2 = new JLabel("On your turn you first conquer fields, then add new units to already conquered ones.");
-        JLabel howTo3 = new JLabel("On one field there are maximum 8 units.");
-        JLabel howTo4 = new JLabel("You can attack/conquer only with fields, that have 2 or more units in them and at least one side that is empty or belongs to enemy.");
-        JLabel howTo5 = new JLabel("To choose field which you want to play from, double click on it.");
-        JLabel howTo6 = new JLabel("Black fields are walls (they're set randomly).");
-        JLabel howTo7 = new JLabel("When attacking enemy, there are few rules:");
-        JLabel howTo8 = new JLabel("1.If defending field has equal units to attacking one, then you have 50% chance to conquer it.");
-        JLabel howTo9 = new JLabel("2.If defending unit has one less unit, than attacking one, then you have 75% chance to conquer it.");
-        JLabel howTo10 = new JLabel("3.If defending unit has one more unit than attacking field, then you still have 25% chance to conquer it.");
-        JLabel howTo11 = new JLabel("4.If difference is more than 2, then wins field with more units.");
-        JLabel howTo12 = new JLabel();
-        JLabel howTo13 = new JLabel("That's all, go and fight! :)");
-
-        back.setForeground(Color.BLACK);
-        howTo1.setForeground(textColor);
-        howTo2.setForeground(textColor);
-        howTo3.setForeground(textColor);
-        howTo4.setForeground(textColor);
-        howTo5.setForeground(textColor);
-        howTo6.setForeground(textColor);
-        howTo7.setForeground(textColor);
-        howTo8.setForeground(textColor);
-        howTo9.setForeground(textColor);
-        howTo10.setForeground(textColor);
-        howTo11.setForeground(textColor);
-        howTo12.setForeground(textColor);
-        howTo13.setForeground(textColor);
+        JLabel[] howTo = new JLabel[13];
+        howTo[0] = new JLabel("Your goal is to conquer all of the enemy's fields.");
+        howTo[1] = new JLabel("On your turn you first conquer fields, then add new units to already conquered ones.");
+        howTo[2] = new JLabel("On one field there are maximum 8 units.");
+        howTo[3] = new JLabel("You can attack/conquer only with fields, that have 2 or more units in them and at least one side that is empty or belongs to enemy.");
+        howTo[4] = new JLabel("To choose field which you want to play from, double click on it.");
+        howTo[5] = new JLabel("Black fields are walls (they're set randomly).");
+        howTo[6] = new JLabel("When attacking enemy, there are few rules:");
+        howTo[7] = new JLabel("1.If defending field has equal units to attacking one, then you have 50% chance to conquer it.");
+        howTo[8] = new JLabel("2.If defending unit has one less unit, than attacking one, then you have 75% chance to conquer it.");
+        howTo[9] = new JLabel("3.If defending unit has one more unit than attacking field, then you still have 25% chance to conquer it.");
+        howTo[10] = new JLabel("4.If difference is more than 2, then wins field with more units.");
+        howTo[11] = new JLabel();
+        howTo[12] = new JLabel("That's all, go and fight! :)");
 
         back.setBackground(buttonColor);
 
         back.setFont(buttonFont);
-        howTo1.setFont(buttonFont);
-        howTo2.setFont(buttonFont);
-        howTo3.setFont(buttonFont);
-        howTo4.setFont(buttonFont);
-        howTo5.setFont(buttonFont);
-        howTo6.setFont(buttonFont);
-        howTo7.setFont(buttonFont);
-        howTo8.setFont(buttonFont);
-        howTo9.setFont(buttonFont);
-        howTo10.setFont(buttonFont);
-        howTo11.setFont(buttonFont);
-        howTo12.setFont(buttonFont);
-        howTo13.setFont(buttonFont);
 
         back.addActionListener(new BackListener(0));
 
         panel.add(back);
-        panel.add(howTo1);
-        panel.add(howTo2);
-        panel.add(howTo3);
-        panel.add(howTo4);
-        panel.add(howTo5);
-        panel.add(howTo6);
-        panel.add(howTo7);
-        panel.add(howTo8);
-        panel.add(howTo9);
-        panel.add(howTo10);
-        panel.add(howTo11);
-        panel.add(howTo12);
-        panel.add(howTo13);
+
+        back.setForeground(Color.BLACK);
+        for (int i = 0; i < howTo.length; ++i) {
+            howTo[i].setForeground(textColor);
+            howTo[i].setFont(buttonFont);
+            panel.add(howTo[i]);
+        }
 
         game.add(panel);
     }

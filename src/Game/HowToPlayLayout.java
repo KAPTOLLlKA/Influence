@@ -38,7 +38,7 @@ class HowToPlayLayout implements LayoutManager {
         int width = game.getWidth();
         int height = (game.getHeight() - 60) / (list.length - 1);
         for (int i = 1; i < list.length; ++i) {
-            list[i].setBounds(0, y, width, height);
+            list[i].setBounds(10, y, width, height);
             y += height - 10;
         }
     }
