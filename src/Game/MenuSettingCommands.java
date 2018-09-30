@@ -192,7 +192,7 @@ class MenuSettingCommands {
         JLabel howTo1 = new JLabel("Your goal is to conquer all of the enemy's fields.");
         JLabel howTo2 = new JLabel("On your turn you first conquer fields, then add new units to already conquered ones.");
         JLabel howTo3 = new JLabel("On one field there are maximum 8 units.");
-        JLabel howTo4 = new JLabel("You can attack/conquer only with fields, that have 2 or more units in them.");
+        JLabel howTo4 = new JLabel("You can attack/conquer only with fields, that have 2 or more units in them and at least one side that is empty or belongs to enemy.");
         JLabel howTo5 = new JLabel("To choose field which you want to play from, double click on it.");
         JLabel howTo6 = new JLabel("Black fields are walls (they're set randomly).");
         JLabel howTo7 = new JLabel("When attacking enemy, there are few rules:");
@@ -200,7 +200,7 @@ class MenuSettingCommands {
         JLabel howTo9 = new JLabel("2.If defending unit has one less unit, than attacking one, then you have 75% chance to conquer it.");
         JLabel howTo10 = new JLabel("3.If defending unit has one more unit than attacking field, then you still have 25% chance to conquer it.");
         JLabel howTo11 = new JLabel("4.If difference is more than 2, then wins field with more units.");
-        JLabel howTo12 = new JLabel("");
+        JLabel howTo12 = new JLabel();
         JLabel howTo13 = new JLabel("That's all, go and fight! :)");
 
         back.setForeground(Color.BLACK);

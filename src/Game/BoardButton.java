@@ -121,7 +121,7 @@ class BoardButton extends JButton {
     }
 
     private void setUnitCount(int units) {
-        if (units >= 1) {
+        if (units >= 1 && units <= 8) {
             unitCount = units;
         }
     }
@@ -153,11 +153,26 @@ class BoardButton extends JButton {
             game.board[x][y + 1].setWaiting(bool);
     }
 
+    private boolean hasSide() {
+        boolean result = false;
+
+        if (x > 0 && game.board[x - 1][y].getBackground() != game.WALL && game.board[x - 1][y].getBelonging() != game.turn)
+            result = true;
+        else if (y > 0 && game.board[x][y - 1].getBackground() != game.WALL && game.board[x][y - 1].getBelonging() != game.turn)
+            result = true;
+        else if (x < game.boardSize - 1 && game.board[x + 1][y].getBackground() != game.WALL && game.board[x + 1][y].getBelonging() != game.turn)
+            result = true;
+        else if (y < game.boardSize - 1 && game.board[x][y + 1].getBackground() != game.WALL && game.board[x][y + 1].getBelonging() != game.turn)
+            result = true;
+
+        return result;
+    }
+
     private class ClickListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (!game.addingUnits) {
-                if (belongsTo == game.turn && game.doubleClick(this) && unitCount > 1) {
+                if (belongsTo == game.turn && game.doubleClick(this) && hasSide() && unitCount > 1) {
                     if (!waiting) {
                         if (!active && thereIsNoActive()) {
                             setActive(true);
@@ -190,10 +205,12 @@ class BoardButton extends JButton {
 
                             if (decision == 0) {
                                 setBelonging(game.turn);
+                                getActiveField().setUnitCount(1);
                                 findActiveAndRemoveIt();
                                 setActive(true);
+                            } else {
+                                getActiveField().setUnitCount(1);
                             }
-                            getActiveField().setUnitCount(1);
                             setUnitCount(1);
                         } else if (activeFieldUnits == unitCount + 1) {
                             decision = game.rand.nextInt(4);
@@ -203,28 +220,31 @@ class BoardButton extends JButton {
                                 getActiveField().setUnitCount(1);
                                 findActiveAndRemoveIt();
                                 setActive(true);
+                            } else {
+                                getActiveField().setUnitCount(1);
                             }
-                            getActiveField().setUnitCount(1);
                             setUnitCount(1);
                         } else if (activeFieldUnits == unitCount - 1) {
                             decision = game.rand.nextInt(4);
 
                             if (decision == 0) {
                                 setBelonging(game.turn);
+                                getActiveField().setUnitCount(1);
                                 findActiveAndRemoveIt();
                                 setActive(true);
+                            } else {
+                                getActiveField().setUnitCount(1);
                             }
-                            getActiveField().setUnitCount(1);
                             setUnitCount(1);
                         } else if (activeFieldUnits < unitCount) {
+                            getActiveField().setUnitCount(1);
                             setUnitCount(unitCount - activeFieldUnits);
-                            getActiveField().setUnitCount(1);
                         } else {
-                            setUnitCount(activeFieldUnits - unitCount);
-                            getActiveField().setUnitCount(1);
                             setBelonging(game.turn);
+                            getActiveField().setUnitCount(1);
                             findActiveAndRemoveIt();
                             setActive(true);
+                            setUnitCount(activeFieldUnits - unitCount);
                         }
                     }
                 }
@@ -233,7 +253,7 @@ class BoardButton extends JButton {
                 if (game.checkWin()) {
                     game.refreshBoard();
                     game.menuIndex = 0;
-                    JOptionPane.showMessageDialog(null, (game.turn == -1 ? "Reds" : "Blues") + " lost!");
+                    JOptionPane.showMessageDialog(null, (game.turn == -1 ? "Blues" : "Reds") + " won!");
                     game.start();
                 }
             } else if (game.unitSetCount > 0 && belongsTo == game.turn && unitCount < 8) {
