@@ -22,6 +22,8 @@ class BoardButton extends JButton {
         belongsTo = BelongsTo;
         x = X;
         y = Y;
+        int fontSize = 30 - game.boardSize;
+        setFont(new Font("SansSerif", Font.BOLD, fontSize));
         if (belongsTo == -1) {
             setBackground(game.rand.nextInt(100) < 15 && canPutHere() ? game.WALL : game.EMPTY);
         } else {
@@ -40,17 +42,13 @@ class BoardButton extends JButton {
     private boolean canPutHere() {
         boolean result = true;
 
-        if (x == 0 && y == game.boardSize - 2)
+        if ((x == game.boardSize - 1 && y == 1) || (x == game.boardSize - 2 && y == 0) || (x == game.boardSize - 2 && y == 1)) {
             result = false;
-        else if (x == 1 && y == game.boardSize - 1)
+        } else if ((x == 0 && y == game.boardSize - 2) || (x == 1 && y == game.boardSize - 1) || (x == 1 && y == game.boardSize - 2))
             result = false;
-        else if (x == game.boardSize - 1 && y == 1)
+        else if (game.p3Mode != 0 && ((x == 0 && y == 1) || (x == 1 && y == 0) || (x == 1 && y == 2)))
             result = false;
-        else if (x == game.boardSize - 2 && y == 0)
-            result = false;
-        else if (x == 1 && y == game.boardSize - 2)
-            result = false;
-        else if (x == game.boardSize - 2 && y == 1)
+        else if (game.p4Mode != 0 && ((x == game.boardSize - 2 && y == game.boardSize - 1) || (x == game.boardSize - 1 && y == game.boardSize - 2) || (x == game.boardSize - 2 && y == game.boardSize - 2)))
             result = false;
 
         return result;
@@ -63,10 +61,15 @@ class BoardButton extends JButton {
 
     void refresh() {
         if (getBackground() != game.WALL) {
-            if (belongsTo == -1)
+            if (belongsTo == 0) {
                 setBackground(game.P1Color);
-            else if (belongsTo == 1)
+            } else if (belongsTo == 1) {
                 setBackground(game.P2Color);
+            } else  if (belongsTo == 2) {
+                setBackground(game.P3Color);
+            } else if (belongsTo == 3) {
+                setBackground(game.P4Color);
+            }
             if (active)
                 setBackground(getBackground().brighter());
             setText(unitCount == 0 ? "" : "" + unitCount);
@@ -191,13 +194,13 @@ class BoardButton extends JButton {
                             setActive(false);
                     }
                 } else if (waiting && !thereIsNoActive() && getActiveFieldUnits() > 1) {
-                    if (belongsTo == 0) {
+                    if (belongsTo == -1) {
                         setUnitCount(getActiveFieldUnits() - 1);
                         getActiveField().setUnitCount(1);
                         findActiveAndRemoveIt();
                         setActive(true);
                         setBelonging(game.turn);
-                    } else if (belongsTo == game.turn * -1) {
+                    } else if (belongsTo != game.turn) {
                         int activeFieldUnits = getActiveFieldUnits();
                         int decision;
 

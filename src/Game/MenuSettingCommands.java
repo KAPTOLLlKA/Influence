@@ -195,7 +195,7 @@ class MenuSettingCommands {
 
         panel.setLayout(new GameboardLayout(game));
 
-        JButton surrender = new JButton("Surrender");
+        JButton surrender = new JButton("Main Menu");
 
         String text = null;
         if (game.turn == 0) {
@@ -218,7 +218,7 @@ class MenuSettingCommands {
         surrender.setFont(buttonFont);
         passTurn.setFont(buttonFont);
 
-        surrender.addActionListener(new SurrenderListener());
+        surrender.addActionListener(new MainMenuListener());
         passTurn.addActionListener(new PassTurnListener());
 
         panel.add(surrender);
@@ -226,12 +226,17 @@ class MenuSettingCommands {
         game.board = new BoardButton[game.boardSize][game.boardSize];
         for (int i = 0; i < game.boardSize; ++i) {
             for (int j = 0; j < game.boardSize; ++j) {
-                if (i == game.boardSize - 1 && j == 0)
-                    game.board[i][j] = new BoardButton(game, -1, i, j);
-                else if (i == 0 && j == game.boardSize - 1)
-                    game.board[i][j] = new BoardButton(game, 1, i, j);
-                else
+                if (i == game.boardSize - 1 && j == 0) {
                     game.board[i][j] = new BoardButton(game, 0, i, j);
+                } else if (i == 0 && j == game.boardSize - 1) {
+                    game.board[i][j] = new BoardButton(game, 1, i, j);
+                } else if (i == 0 && j == 0 && game.p3Mode != 0) {
+                    game.board[i][j] = new BoardButton(game, 2, i, j);
+                } else if (i == game.boardSize - 1 && j == game.boardSize - 1 && game.p4Mode != 0) {
+                    game.board[i][j] = new BoardButton(game, 3, i, j);
+                } else {
+                    game.board[i][j] = new BoardButton(game, -1, i, j);
+                }
                 panel.add(game.board[i][j]);
             }
         }
@@ -259,9 +264,9 @@ class MenuSettingCommands {
         howTo[5] = new JLabel("Black fields are walls (they're set randomly).");
         howTo[6] = new JLabel("When attacking enemy, there are few rules:");
         howTo[7] = new JLabel("1.If defending field has equal units to attacking one, then you have 50% chance to conquer it.");
-        howTo[8] = new JLabel("2.If defending unit has one less unit, than attacking one, then you have 75% chance to conquer it.");
-        howTo[9] = new JLabel("3.If defending unit has one more unit than attacking field, then you still have 25% chance to conquer it.");
-        howTo[10] = new JLabel("4.If difference is more than 2, then wins field with more units.");
+        howTo[8] = new JLabel("2.If defending field has one less unit, than attacking one, then you have 75% chance to conquer it.");
+        howTo[9] = new JLabel("3.If defending field has one more unit than attacking field, then you still have 25% chance to conquer it.");
+        howTo[10] = new JLabel("4.If difference is more than 1, then field with more units wins.");
         howTo[11] = new JLabel();
         howTo[12] = new JLabel("That's all, go and fight! :)");
 
@@ -286,8 +291,7 @@ class MenuSettingCommands {
     private class StartListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (game.sound)
-                game.getClip("Sounds\\button.wav").start();
+            game.makeButtonSound();
             game.menuIndex = 2;
             game.start();
         }
@@ -296,8 +300,7 @@ class MenuSettingCommands {
     private class SettingsListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (game.sound)
-                game.getClip("Sounds\\button.wav").start();
+            game.makeButtonSound();
             game.menuIndex = 1;
             game.start();
         }
@@ -306,8 +309,7 @@ class MenuSettingCommands {
     private class HowToPlayListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (game.sound)
-                game.getClip("Sounds\\button.wav").start();
+            game.makeButtonSound();
             game.menuIndex = 5;
             game.start();
         }
@@ -316,8 +318,7 @@ class MenuSettingCommands {
     private class ExitListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (game.sound)
-                game.getClip("Sounds\\button.wav").start();
+            game.makeButtonSound();
             System.exit(0);
         }
     }
@@ -331,8 +332,7 @@ class MenuSettingCommands {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (game.sound)
-                game.getClip("Sounds\\button.wav").start();
+            game.makeButtonSound();
             if (!game.fullscreen) {
                 game.setExtendedState(JFrame.MAXIMIZED_BOTH);
             } else {
@@ -358,7 +358,7 @@ class MenuSettingCommands {
             game.backgroundMusicPlaying = !game.backgroundMusicPlaying;
             sound.setText("Sound: " + (game.sound ? "On" : "Off"));
             if (game.sound) {
-                game.getClip("Sounds\\button.wav").start();
+                game.makeButtonSound();
                 game.backgroundMusic = game.getClip("Sounds\\menu background.wav");
                 game.backgroundMusic.loop(Clip.LOOP_CONTINUOUSLY);
             } else
@@ -375,8 +375,7 @@ class MenuSettingCommands {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (game.sound)
-                game.getClip("Sounds\\button.wav").start();
+            game.makeButtonSound();
             game.menuIndex = menuChange;
             game.start();
         }
@@ -391,8 +390,7 @@ class MenuSettingCommands {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (game.sound)
-                game.getClip("Sounds\\button.wav").start();
+            game.makeButtonSound();
             if (player == 0) {
                 ++game.p1Mode;
                 if (game.p1Mode > 2) {
@@ -413,8 +411,7 @@ class MenuSettingCommands {
                 ++game.p4Mode;
                 if (game.p3Mode == 0) {
                     game.p4Mode = 0;
-                }
-                else if (game.p4Mode > 2) {
+                } else if (game.p4Mode > 2) {
                     game.p4Mode = 0;
                 }
             }
@@ -425,8 +422,7 @@ class MenuSettingCommands {
     private class ToBoardSizeMenuListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (game.sound)
-                game.getClip("Sounds\\button.wav").start();
+            game.makeButtonSound();
             game.menuIndex = 3;
             game.start();
         }
@@ -446,43 +442,46 @@ class MenuSettingCommands {
                 if (game.boardSize > 15) {
                     JOptionPane.showMessageDialog(game, "Maximum board size is 15!");
                     game.boardSize = 0;
-                    if (game.sound)
-                        game.getClip("Sounds\\button.wav").start();
+                    game.makeButtonSound();
                 } else if (game.boardSize < 5) {
                     JOptionPane.showMessageDialog(game, "Minimum board size is 5!");
                     game.boardSize = 0;
-                    if (game.sound)
-                        game.getClip("Sounds\\button.wav").start();
+                    game.makeButtonSound();
                 } else {
                     game.menuIndex = 4;
                     game.start();
                 }
             } catch (Exception ex) {
-                if (game.sound)
-                    game.getClip("Sounds\\button.wav").start();
+                game.makeButtonSound();
                 JOptionPane.showMessageDialog(game, "Enter an integer!");
             }
         }
     }
 
-    private class SurrenderListener implements ActionListener {
+    //Make AI
+    private class MainMenuListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (game.sound)
-                game.getClip("Sounds\\button.wav").start();
-            JOptionPane.showMessageDialog(null, (game.turn == -1 ? "Blues" : "Reds") + " lost!");
-            game.menuIndex = 0;
-            game.start();
+            game.makeButtonSound();
+            int decision = JOptionPane.showConfirmDialog(null, "Exit to main menu?", "An Inane Question", JOptionPane.YES_NO_OPTION);
+            if (decision == 0) {
+                game.menuIndex = 0;
+                game.start();
+            }
         }
     }
 
     private class PassTurnListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (game.sound)
-                game.getClip("Sounds\\button.wav").start();
+            game.makeButtonSound();
             if (game.addingUnits) {
-                game.turn *= -1;
+                do {
+                    ++game.turn;
+                    if (game.turn > 3) {
+                        game.turn = 0;
+                    }
+                } while (game.countPlayerUnits() == 0);
                 game.addingUnits = false;
             } else {
                 game.unitSetCount = game.countPlayerUnits();

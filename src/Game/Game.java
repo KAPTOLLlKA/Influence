@@ -41,8 +41,8 @@ public class Game extends JFrame {
     Object lastClickedButton;
     float lasClickTime;
 
-    int menuIndex = 0;
     int unitSetCount;
+    int menuIndex = 0;
     int p1Mode = 1;
     int p2Mode = 2;
     int p3Mode = 0;
@@ -230,6 +230,11 @@ public class Game extends JFrame {
             System.exit(0);
         }
         return getClip("ERROR");
+    }
+
+    void makeButtonSound() {
+        if (sound)
+            getClip("Sounds\\button.wav").start();
     }
 
     boolean doubleClick(Object obj) {
