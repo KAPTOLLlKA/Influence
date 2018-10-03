@@ -26,6 +26,9 @@ class BoardButton extends JButton {
         setFont(new Font("SansSerif", Font.BOLD, fontSize));
         if (belongsTo == -1) {
             setBackground(game.rand.nextInt(100) < 15 && canPutHere() ? game.WALL : game.EMPTY);
+            if (getBackground() == game.WALL) {
+                belongsTo = -2;
+            }
         } else {
             int units = 2;
             if (game.boardSize >= 8 && game.boardSize <= 12)
@@ -46,9 +49,9 @@ class BoardButton extends JButton {
             result = false;
         } else if ((x == 0 && y == game.boardSize - 2) || (x == 1 && y == game.boardSize - 1) || (x == 1 && y == game.boardSize - 2))
             result = false;
-        else if (game.p3Mode != 0 && ((x == 0 && y == 1) || (x == 1 && y == 0) || (x == 1 && y == 2)))
+        else if (game.p3Mode != game.NONE && ((x == 0 && y == 1) || (x == 1 && y == 0) || (x == 1 && y == 2)))
             result = false;
-        else if (game.p4Mode != 0 && ((x == game.boardSize - 2 && y == game.boardSize - 1) || (x == game.boardSize - 1 && y == game.boardSize - 2) || (x == game.boardSize - 2 && y == game.boardSize - 2)))
+        else if (game.p4Mode != game.NONE && ((x == game.boardSize - 2 && y == game.boardSize - 1) || (x == game.boardSize - 1 && y == game.boardSize - 2) || (x == game.boardSize - 2 && y == game.boardSize - 2)))
             result = false;
 
         return result;
@@ -74,9 +77,39 @@ class BoardButton extends JButton {
                 setBackground(getBackground().brighter());
             setText(unitCount == 0 ? "" : "" + unitCount);
             setForeground(Color.BLACK);
-            game.ai.addField(x, y);
         } else
             setEnabled(false);
+    }
+
+    boolean isEndangered() {
+        boolean result = false;
+
+        if (x > 0 && game.board[x - 1][y].getBelonging() >= 0 && game.board[x - 1][y].getBelonging() != game.turn && game.board[x - 1][y].getUnitCount() > 1) {
+            result = true;
+        } else if (y > 0 && game.board[x][y - 1].getBelonging() >= 0 && game.board[x][y - 1].getBelonging() != game.turn && game.board[x][y - 1].getUnitCount() > 1) {
+            result = true;
+        } else if (x < game.boardSize - 1 && game.board[x + 1][y].getBelonging() >= 0 && game.board[x + 1][y].getBelonging() != game.turn && game.board[x + 1][y].getUnitCount() > 1) {
+            result = true;
+        } else if (y < game.boardSize - 1 && game.board[x][y + 1].getBelonging() >= 0 && game.board[x][y + 1].getBelonging() != game.turn && game.board[x][y + 1].getUnitCount() > 1) {
+            result = true;
+        }
+
+        return result;
+    }
+
+    boolean iHaveEmptySide() {
+        boolean result = false;
+
+        if (x > 0 && game.board[x - 1][y].getBackground() != game.EMPTY)
+            result = true;
+        else if (y > 0 && game.board[x][y - 1].getBackground() != game.EMPTY)
+            result = true;
+        else if (x < game.boardSize - 1 && game.board[x + 1][y].getBackground() != game.EMPTY)
+            result = true;
+        else if (y < game.boardSize - 1 && game.board[x][y + 1].getBackground() != game.EMPTY)
+            result = true;
+
+        return result;
     }
 
     private boolean thereIsNoActive() {
@@ -112,11 +145,19 @@ class BoardButton extends JButton {
         }
     }
 
-    private boolean getActive() {
+    int getBoardX() {
+        return x;
+    }
+
+    int getBoardY() {
+        return y;
+    }
+
+    boolean getActive() {
         return active;
     }
 
-    private int getUnitCount() {
+    int getUnitCount() {
         return unitCount;
     }
 
@@ -130,12 +171,12 @@ class BoardButton extends JButton {
         }
     }
 
-    void setWaiting(boolean bool) {
-        waiting = bool;
-    }
-
     private void setBelonging(int belonging) {
         belongsTo = belonging;
+    }
+
+    void setWaiting(boolean bool) {
+        waiting = bool;
     }
 
     void setActive(boolean bool) {
@@ -157,7 +198,7 @@ class BoardButton extends JButton {
             game.board[x][y + 1].setWaiting(bool);
     }
 
-    private boolean hasSide() {
+    boolean hasSide() {
         boolean result = false;
 
         if (x > 0 && game.board[x - 1][y].getBackground() != game.WALL && game.board[x - 1][y].getBelonging() != game.turn)

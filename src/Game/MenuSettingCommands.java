@@ -16,7 +16,7 @@ class MenuSettingCommands {
 
     private final Color buttonColor = new Color(100, 0, 200);
 
-    private final Font buttonFont = new Font("SansSerif", Font.BOLD, 20);
+    private final Font buttonFont = new Font("Bahnschrift SemiBold", Font.BOLD, 20);
 
     private final Color textColor = new Color(200, 100, 0);
 
@@ -25,7 +25,7 @@ class MenuSettingCommands {
         this.panel = panel;
         influence = new JLabel("Influence");
         influence.setForeground(textColor);
-        influence.setFont(new Font("SansSerif", Font.BOLD, 50));
+        influence.setFont(new Font("Bahnschrift SemiBold", Font.BOLD, 50));
         turnShower.setForeground(influence.getForeground());
         turnShower.setFont(buttonFont);
     }
@@ -230,9 +230,9 @@ class MenuSettingCommands {
                     game.board[i][j] = new BoardButton(game, 0, i, j);
                 } else if (i == 0 && j == game.boardSize - 1) {
                     game.board[i][j] = new BoardButton(game, 1, i, j);
-                } else if (i == 0 && j == 0 && game.p3Mode != 0) {
+                } else if (i == 0 && j == 0 && game.p3Mode != game.NONE) {
                     game.board[i][j] = new BoardButton(game, 2, i, j);
-                } else if (i == game.boardSize - 1 && j == game.boardSize - 1 && game.p4Mode != 0) {
+                } else if (i == game.boardSize - 1 && j == game.boardSize - 1 && game.p4Mode != game.NONE) {
                     game.board[i][j] = new BoardButton(game, 3, i, j);
                 } else {
                     game.board[i][j] = new BoardButton(game, -1, i, j);
@@ -246,6 +246,9 @@ class MenuSettingCommands {
 
         game.add(panel);
         game.setVisible(true);
+        if ((game.turn == 0 && game.p1Mode == game.AI) || (game.turn == 1 && game.p2Mode == game.AI) || (game.turn == 2 && game.p3Mode == game.AI) || (game.turn == 3 && game.p4Mode == game.AI)) {
+            game.computerMakeTurn = true;
+        }
     }
 
     void setHowToPlayMenu() {
@@ -263,10 +266,10 @@ class MenuSettingCommands {
         howTo[4] = new JLabel("To choose field which you want to play from, double click on it.");
         howTo[5] = new JLabel("Black fields are walls (they're set randomly).");
         howTo[6] = new JLabel("When attacking enemy, there are few rules:");
-        howTo[7] = new JLabel("1.If defending field has equal units to attacking one, then you have 50% chance to conquer it.");
-        howTo[8] = new JLabel("2.If defending field has one less unit, than attacking one, then you have 75% chance to conquer it.");
-        howTo[9] = new JLabel("3.If defending field has one more unit than attacking field, then you still have 25% chance to conquer it.");
-        howTo[10] = new JLabel("4.If difference is more than 1, then field with more units wins.");
+        howTo[7] = new JLabel("1) If defending field has equal units to attacking one, then you have 50% chance to conquer it.");
+        howTo[8] = new JLabel("2) If defending field has one less unit, than attacking one, then you have 75% chance to conquer it.");
+        howTo[9] = new JLabel("3) If defending field has one more unit than attacking field, then you still have 25% chance to conquer it.");
+        howTo[10] = new JLabel("4) If difference is more than 1, then field with more units wins.");
         howTo[11] = new JLabel();
         howTo[12] = new JLabel("That's all, go and fight! :)");
 
@@ -393,26 +396,24 @@ class MenuSettingCommands {
             game.makeButtonSound();
             if (player == 0) {
                 ++game.p1Mode;
-                if (game.p1Mode > 2) {
-                    game.p1Mode = 1;
+                if (game.p1Mode > game.AI) {
+                    game.p1Mode = game.PLAYER;
                 }
             } else if (player == 1) {
                 ++game.p2Mode;
-                if (game.p2Mode > 2) {
-                    game.p2Mode = 1;
+                if (game.p2Mode > game.AI) {
+                    game.p2Mode = game.PLAYER;
                 }
             } else if (player == 2) {
                 ++game.p3Mode;
-                if (game.p3Mode > 2) {
-                    game.p3Mode = 0;
-                    game.p4Mode = 0;
+                if (game.p3Mode > game.AI) {
+                    game.p3Mode = game.NONE;
+                    game.p4Mode = game.NONE;
                 }
             } else if (player == 3) {
                 ++game.p4Mode;
-                if (game.p3Mode == 0) {
-                    game.p4Mode = 0;
-                } else if (game.p4Mode > 2) {
-                    game.p4Mode = 0;
+                if (game.p3Mode == game.NONE || game.p4Mode > game.AI) {
+                    game.p4Mode = game.NONE;
                 }
             }
             game.setPlayerModeTexts();
@@ -458,14 +459,18 @@ class MenuSettingCommands {
         }
     }
 
-    //Make AI
     private class MainMenuListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             game.makeButtonSound();
-            int decision = JOptionPane.showConfirmDialog(null, "Exit to main menu?", "An Inane Question", JOptionPane.YES_NO_OPTION);
+            int decision = JOptionPane.showConfirmDialog(null, "Exit to main menu?", "Confirmation", JOptionPane.YES_NO_OPTION);
             if (decision == 0) {
                 game.menuIndex = 0;
+                game.p1Mode = game.PLAYER;
+                game.p2Mode = game.AI;
+                game.p3Mode = game.NONE;
+                game.p4Mode = game.NONE;
+                game.addingUnits = false;
                 game.start();
             }
         }
@@ -482,6 +487,9 @@ class MenuSettingCommands {
                         game.turn = 0;
                     }
                 } while (game.countPlayerUnits() == 0);
+                if (game.isAi()) {
+                    game.computerMakeTurn = true;
+                }
                 game.addingUnits = false;
             } else {
                 game.unitSetCount = game.countPlayerUnits();
@@ -489,6 +497,9 @@ class MenuSettingCommands {
             }
             game.passTurnRefreshBoard();
             game.setTurnShower();
+            if (game.computerMakeTurn) {
+                game.start();
+            }
         }
     }
 }

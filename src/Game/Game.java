@@ -11,10 +11,12 @@ import java.util.Random;
 public class Game extends JFrame {
     Random rand = new Random();
 
+    final int NONE = 0;
+    final int PLAYER = 1;
+    final int AI = 2;
+
     int boardSize;
     int turn;
-
-    AiLogics ai = new AiLogics(this);
 
     Clip backgroundMusic = getClip("Sounds\\menu background.wav");
 
@@ -37,16 +39,22 @@ public class Game extends JFrame {
     boolean sound = true;
     boolean backgroundMusicPlaying = false;
     boolean addingUnits = false;
+    boolean computerMakeTurn = false;
 
     Object lastClickedButton;
     float lasClickTime;
 
     int unitSetCount;
     int menuIndex = 0;
-    int p1Mode = 1;
-    int p2Mode = 2;
-    int p3Mode = 0;
-    int p4Mode = 0;
+    int p1Mode = PLAYER;
+    int p2Mode = AI;
+    int p3Mode = NONE;
+    int p4Mode = NONE;
+
+    private AiLogic ai1 = new AiLogic(this);
+    private AiLogic ai2 = new AiLogic(this);
+    private AiLogic ai3;
+    private AiLogic ai4;
 
     public Game() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -75,16 +83,30 @@ public class Game extends JFrame {
             menus.setBoardSizeMenu();
         } else if (menuIndex == 4) {
             int playerCount = 2;
-            if (p3Mode != 0) {
+            if (p3Mode != NONE) {
                 ++playerCount;
-            }
-            if (p4Mode != 0) {
-                ++playerCount;
+                ai3 = new AiLogic(this);
+                if (p4Mode != NONE) {
+                    ++playerCount;
+                    ai4 = new AiLogic(this);
+                }
             }
             turn = (rand.nextInt(playerCount));
             menus.setGameStart();
         } else if (menuIndex == 5) {
             menus.setHowToPlayMenu();
+        }
+        if (computerMakeTurn) {
+            computerMakeTurn = false;
+            if (turn == 0 && p1Mode == AI) {
+                ai1.makeTurn();
+            } else if (turn == 1 && p2Mode == AI) {
+                ai2.makeTurn();
+            } else if (turn == 2 && p3Mode == AI) {
+                ai3.makeTurn();
+            } else if (turn == 3 && p4Mode == AI) {
+                ai4.makeTurn();
+            }
         }
         setVisible(true);
         menuIndex = -1;
@@ -99,6 +121,38 @@ public class Game extends JFrame {
                     ++result;
                 }
             }
+        }
+
+        return result;
+    }
+
+    boolean isNone() {
+        boolean result = false;
+
+        if (turn == 0 && p1Mode == NONE) {
+            result = true;
+        } else if (turn == 1 && p2Mode == NONE) {
+            result = true;
+        } else if (turn == 2 && p3Mode == NONE) {
+            result = true;
+        } else if (turn == 3 && p4Mode == NONE) {
+            result = true;
+        }
+
+        return result;
+    }
+
+    boolean isAi() {
+        boolean result = false;
+
+        if (turn == 0 && p1Mode == AI) {
+            result = true;
+        } else if (turn == 1 && p2Mode == AI) {
+            result = true;
+        } else if (turn == 2 && p3Mode == AI) {
+            result = true;
+        } else if (turn == 3 && p4Mode == AI) {
+            result = true;
         }
 
         return result;
@@ -162,31 +216,31 @@ public class Game extends JFrame {
         JButton p3Button = (JButton) background.getComponent(2);
         JButton p4Button = (JButton) background.getComponent(3);
 
-        if (p1Mode == 1) {
+        if (p1Mode == PLAYER) {
             p1Button.setText("Player");
-        } else if (p1Mode == 2) {
+        } else if (p1Mode == AI) {
             p1Button.setText("AI");
         }
 
-        if (p2Mode == 1) {
+        if (p2Mode == PLAYER) {
             p2Button.setText("Player");
-        } else if (p2Mode == 2) {
+        } else if (p2Mode == AI) {
             p2Button.setText("AI");
         }
 
-        if (p3Mode == 0) {
+        if (p3Mode == NONE) {
             p3Button.setText("None");
-        } else if (p3Mode == 1) {
+        } else if (p3Mode == PLAYER) {
             p3Button.setText("Player");
-        } else if (p3Mode == 2) {
+        } else if (p3Mode == AI) {
             p3Button.setText("AI");
         }
 
-        if (p4Mode == 0) {
+        if (p4Mode == NONE) {
             p4Button.setText("None");
-        } else if (p4Mode == 1) {
+        } else if (p4Mode == PLAYER) {
             p4Button.setText("Player");
-        } else if (p4Mode == 2) {
+        } else if (p4Mode == AI) {
             p4Button.setText("AI");
         }
     }
@@ -230,6 +284,18 @@ public class Game extends JFrame {
             System.exit(0);
         }
         return getClip("ERROR");
+    }
+
+    JButton getPassTurnButton() {
+        return (JButton) background.getComponent(background.getComponents().length - 2);
+    }
+
+    void passTime(int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Some error occured :(");
+        }
     }
 
     void makeButtonSound() {
