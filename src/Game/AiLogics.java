@@ -30,39 +30,110 @@ class AiLogic {
         passTurnButton = game.getPassTurnButton();
         findMyFields();
 
-        //while (playableFields.size() > 0) {
+        while (playableFields.size() > 0) {
             ArrayList<BoardButton> attackedFields = findUnitsUnderAttack();
             int fieldsQuantity = playableFields.size();
             int attackedFieldsQuantity = attackedFields.size();
 
             if (attackedFieldsQuantity != 0) {
                 for (int i = 0; i < attackedFieldsQuantity; ++i) {
-                    attackedFields.get(i).doClick();
-                    float start = System.nanoTime();
-                    while (System.nanoTime() - start < 200000000);
-                    attackedFields.get(i).doClick();
+                    if (!attackedFields.get(i).getActive())
+                        attackedFields.get(i).doClick();
                     attackLowestUnitFieldOrRun(attackedFields.get(i));
+                    game.passTime(150);
                 }
             } else {
+                BoardButton maxUnitsField = playableFields.get(0);
+                for (int i = 0; i < fieldsQuantity; ++i) {
+                    if (maxUnitsField.getUnitCount() < playableFields.get(i).getUnitCount()) {
+                        maxUnitsField = playableFields.get(i);
+                    }
+                }
+                if (!maxUnitsField.getActive())
+                    maxUnitsField.doClick();
 
+                int side = getMostTurnsSide(maxUnitsField);
+                int x = maxUnitsField.getBoardX();
+                int y = maxUnitsField.getBoardY();
+
+                if (side == 0) {
+                    game.board[x][y - 1].doClick();
+                } else if (side == 1) {
+                    game.board[x - 1][y].doClick();
+                } else if (side == 2) {
+                    game.board[x][y + 1].doClick();
+                } else {
+                    game.board[x + 1][y].doClick();
+                }
             }
 
-            //findMyFields();
-            passTurnButton.doClick();
-            float start = System.nanoTime();
-            while (System.nanoTime() - start < 100000000);
-            passTurnButton.doClick();
-        //}
+            findMyFields();
+            game.passTime(150);
+        }
 
-        playableFields.clear();
+        passTurnButton.doClick();
+
+        while (game.unitSetCount > 0) {
+            ArrayList<BoardButton> attackedFields = findUnitsUnderAttack();
+        }
+
+        game.passTime(1000);
+        passTurnButton.doClick();
+    }
+
+    private int getMostTurnsSide(BoardButton field) {
+        int result = 0;
+        int maxSide;
+
+        int x = field.getBoardX();
+        int y = field.getBoardY();
+
+        int left = 1;
+        while (y > left - 1 && game.board[x][y - left].getBelonging() >= -1) {
+            ++left;
+        }
+        maxSide = left;
+
+        int up = 1;
+        while (x > up - 1 && game.board[x - up][y].getBelonging() >= -1) {
+            ++up;
+        }
+
+        if (up > maxSide) {
+            maxSide = up;
+            result = 1;
+        }
+
+        int right = 1;
+        while (y < game.boardSize - right && game.board[x][y + right].getBelonging() == -1) {
+            ++right;
+        }
+
+        if (right > maxSide) {
+            maxSide = right;
+            result = 2;
+        }
+
+        int down = 1;
+        while (x < game.boardSize - right && game.board[x + down][y].getBelonging() >= -1) {
+            ++down;
+        }
+
+        if (down > maxSide) {
+            result = 3;
+        }
+
+        return result;
     }
 
     private ArrayList<BoardButton> findUnitsUnderAttack() {
         ArrayList<BoardButton> result = new ArrayList<>();
-
-        for (int i = 0; i < playableFields.size(); ++i) {
-            if (playableFields.get(i).isEndangered()) {
-                result.add(playableFields.get(i));
+        
+        for (int i = 0; i < game.boardSize; ++i) {
+            for (int j = 0; j < game.boardSize; ++j) {
+                if (game.board[i][j].isEndangered()) {
+                    result.add(game.board[i][j]);
+                }
             }
         }
 
@@ -75,7 +146,7 @@ class AiLogic {
 
         int[] nFieldsUnits = new int[4];
 
-        if (y > 0 && game.board[x][y - 1].getBelonging() >= 0 && game.board[x][y - 1].getBelonging() != game.turn) {
+        if (y > 0 && game.board[x][y - 1].getBelonging() >= -1 && game.board[x][y - 1].getBelonging() != game.turn) {
             nFieldsUnits[0] = game.board[x][y - 1].getUnitCount();
         } else {
             nFieldsUnits[0] = -1;
@@ -85,12 +156,12 @@ class AiLogic {
         } else {
             nFieldsUnits[1] = -1;
         }
-        if (y < game.boardSize - 1 && game.board[x][y + 1].getBelonging() >= 0 && game.board[x][y + 1].getBelonging() != game.turn) {
+        if (y < game.boardSize - 1 && game.board[x][y + 1].getBelonging() >= -1 && game.board[x][y + 1].getBelonging() != game.turn) {
             nFieldsUnits[2] = game.board[x][y + 1].getUnitCount();
         } else {
             nFieldsUnits[2] = -1;
         }
-        if (x < game.boardSize - 1 && game.board[x + 1][y].getBelonging() >= 0 && game.board[x + 1][y].getBelonging() != game.turn) {
+        if (x < game.boardSize - 1 && game.board[x + 1][y].getBelonging() >= -1 && game.board[x + 1][y].getBelonging() != game.turn) {
             nFieldsUnits[3] = game.board[x + 1][y].getUnitCount();
         } else {
             nFieldsUnits[3] = -1;

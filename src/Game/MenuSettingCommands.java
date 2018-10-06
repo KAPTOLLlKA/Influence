@@ -470,7 +470,12 @@ class MenuSettingCommands {
                 game.p2Mode = game.AI;
                 game.p3Mode = game.NONE;
                 game.p4Mode = game.NONE;
+                game.ai1 = new AiLogic(game);
+                game.ai2 = new AiLogic(game);
+                game.ai3 = null;
+                game.ai4 = null;
                 game.addingUnits = false;
+                game.computerMakeTurn = false;
                 game.start();
             }
         }

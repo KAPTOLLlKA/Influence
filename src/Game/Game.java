@@ -41,9 +41,6 @@ public class Game extends JFrame {
     boolean addingUnits = false;
     boolean computerMakeTurn = false;
 
-    Object lastClickedButton;
-    float lasClickTime;
-
     int unitSetCount;
     int menuIndex = 0;
     int p1Mode = PLAYER;
@@ -51,10 +48,10 @@ public class Game extends JFrame {
     int p3Mode = NONE;
     int p4Mode = NONE;
 
-    private AiLogic ai1 = new AiLogic(this);
-    private AiLogic ai2 = new AiLogic(this);
-    private AiLogic ai3;
-    private AiLogic ai4;
+    AiLogic ai1 = new AiLogic(this);
+    AiLogic ai2 = new AiLogic(this);
+    AiLogic ai3;
+    AiLogic ai4;
 
     public Game() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -301,10 +298,6 @@ public class Game extends JFrame {
     void makeButtonSound() {
         if (sound)
             getClip("Sounds\\button.wav").start();
-    }
-
-    boolean doubleClick(Object obj) {
-        return System.nanoTime() - lasClickTime < 250000000 && obj == lastClickedButton;
     }
 
     private class BackgroundPanel extends JPanel {

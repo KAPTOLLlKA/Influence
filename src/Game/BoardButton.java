@@ -84,13 +84,13 @@ class BoardButton extends JButton {
     boolean isEndangered() {
         boolean result = false;
 
-        if (x > 0 && game.board[x - 1][y].getBelonging() >= 0 && game.board[x - 1][y].getBelonging() != game.turn && game.board[x - 1][y].getUnitCount() > 1) {
+        if (x > 0 && game.board[x - 1][y].getBelonging() != game.turn && game.board[x - 1][y].getUnitCount() > 1) {
             result = true;
-        } else if (y > 0 && game.board[x][y - 1].getBelonging() >= 0 && game.board[x][y - 1].getBelonging() != game.turn && game.board[x][y - 1].getUnitCount() > 1) {
+        } else if (y > 0 && game.board[x][y - 1].getBelonging() != game.turn && game.board[x][y - 1].getUnitCount() > 1) {
             result = true;
-        } else if (x < game.boardSize - 1 && game.board[x + 1][y].getBelonging() >= 0 && game.board[x + 1][y].getBelonging() != game.turn && game.board[x + 1][y].getUnitCount() > 1) {
+        } else if (x < game.boardSize - 1 && game.board[x + 1][y].getBelonging() != game.turn && game.board[x + 1][y].getUnitCount() > 1) {
             result = true;
-        } else if (y < game.boardSize - 1 && game.board[x][y + 1].getBelonging() >= 0 && game.board[x][y + 1].getBelonging() != game.turn && game.board[x][y + 1].getUnitCount() > 1) {
+        } else if (y < game.boardSize - 1 && game.board[x][y + 1].getBelonging() != game.turn && game.board[x][y + 1].getUnitCount() > 1) {
             result = true;
         }
 
@@ -217,7 +217,7 @@ class BoardButton extends JButton {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (!game.addingUnits) {
-                if (belongsTo == game.turn && game.doubleClick(this) && hasSide() && unitCount > 1) {
+                if (belongsTo == game.turn && hasSide() && unitCount > 1) {
                     if (!waiting) {
                         if (!active && thereIsNoActive()) {
                             setActive(true);
@@ -293,8 +293,6 @@ class BoardButton extends JButton {
                         }
                     }
                 }
-                game.lasClickTime = System.nanoTime();
-                game.lastClickedButton = this;
                 int winner = game.checkWin();
                 if (winner != -1) {
                     game.refreshBoard();
