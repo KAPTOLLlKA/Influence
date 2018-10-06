@@ -97,6 +97,45 @@ class BoardButton extends JButton {
         return result;
     }
 
+    boolean isEndangeredAndNotDefended() {
+        boolean result = false;
+
+        if (x > 0 && game.board[x - 1][y].getBelonging() != game.turn && game.board[x - 1][y].getUnitCount() > 1 && game.board[x - 1][y].getUnitCount() > unitCount) {
+            result = true;
+        } else if (y > 0 && game.board[x][y - 1].getBelonging() != game.turn && game.board[x][y - 1].getUnitCount() > 1 && game.board[x][y - 1].getUnitCount() > unitCount) {
+            result = true;
+        } else if (x < game.boardSize - 1 && game.board[x + 1][y].getBelonging() != game.turn && game.board[x + 1][y].getUnitCount() > 1 && game.board[x + 1][y].getUnitCount() > unitCount) {
+            result = true;
+        } else if (y < game.boardSize - 1 && game.board[x][y + 1].getBelonging() != game.turn && game.board[x][y + 1].getUnitCount() > 1 && game.board[x][y + 1].getUnitCount() > unitCount) {
+            result = true;
+        }
+
+        return result;
+    }
+
+    int getNeighbourFieldsAttack() {
+        int result = 0;
+
+        if (x > 0 && game.board[x - 1][y].getBelonging() != game.turn && game.board[x - 1][y].getUnitCount() > 1) {
+            result += game.board[x - 1][y].unitCount;
+        }
+        if (y > 0 && game.board[x][y - 1].getBelonging() != game.turn && game.board[x][y - 1].getUnitCount() > 1) {
+            result += game.board[x][y - 1].unitCount;
+        }
+        if (x < game.boardSize - 1 && game.board[x + 1][y].getBelonging() != game.turn && game.board[x + 1][y].getUnitCount() > 1) {
+            result += game.board[x + 1][y].unitCount;
+        }
+        if (y < game.boardSize - 1 && game.board[x][y + 1].getBelonging() != game.turn && game.board[x][y + 1].getUnitCount() > 1) {
+            result += game.board[x][y + 1].unitCount;
+        }
+
+        if (result > 7) {
+            result = 7;
+        }
+
+        return result;
+    }
+
     boolean iHaveEmptySide() {
         boolean result = false;
 
