@@ -2,29 +2,32 @@ package Game;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.function.Predicate;
 
 class AiLogic {
     private Game game;
 
     private ArrayList<BoardButton> playableFields = new ArrayList<>();
 
+    private static final int DELAY = 2000;
+
     AiLogic(Game game) {
         this.game = game;
     }
-
+//Fix bugs
     void makeTurn() {
         JButton passTurnButton = game.getPassTurnButton();
-        findMyFields();
+        findMyPlayableFields();
 
         while (playableFields.size() > 0) {
-            ArrayList<BoardButton> attackedFields = findUnitsUnderAttack();
+            ArrayList<BoardButton> attackedFields = findFieldsUnderAttack();
 
             if (attackedFields.size() != 0) {
                 for (int i = 0; i < attackedFields.size(); ++i) {
                     if (!attackedFields.get(i).getActive())
                         attackedFields.get(i).doClick();
                     attackLowestUnitFieldOrRun(attackedFields.get(i));
-                    game.passTime(150);
+                    game.passTime(DELAY);
                 }
             } else {
                 BoardButton maxUnitsField = playableFields.get(0);
@@ -36,7 +39,7 @@ class AiLogic {
                 if (!maxUnitsField.getActive())
                     maxUnitsField.doClick();
 
-                int side = getMostTurnsSide(maxUnitsField);
+                int side = getMostTurns(maxUnitsField).side;
                 int x = maxUnitsField.getBoardX();
                 int y = maxUnitsField.getBoardY();
 
@@ -51,14 +54,34 @@ class AiLogic {
                 }
             }
 
-            game.passTime(150);
-            findMyFields();
+            game.passTime(DELAY);
+            findMyPlayableFields();
         }
 
-        passTurnButton.doClick();
-
+        if (!game.addingUnits) {
+            passTurnButton.doClick();
+        }
+        int firstlyAttackedFieldsCount = 0;
+        boolean firstEnter = true;
+        boolean addRemainings = false;
         while (game.unitSetCount > 0) {
-            ArrayList<BoardButton> attackedFields = findEndangeredUnitsThatAreNotDefended();
+            int c = 0;
+            findMyFields();
+            ArrayList<BoardButton> attackedFields = findEndangeredFieldsThatAreNotDefended();
+            ArrayList<BoardButton> defendedFields = findFieldsThatHaveAttackEqualToNeighbours();
+            if (firstEnter) {
+                firstEnter = false;
+                firstlyAttackedFieldsCount = attackedFields.size();
+            }
+
+            for (int i = 0; i < playableFields.size(); ++i) {
+                playableFields.removeIf(new Predicate<BoardButton>() {
+                    @Override
+                    public boolean test(BoardButton boardButton) {
+                        return getMostTurns(boardButton).sideMoves <= boardButton.getUnitCount();
+                    }
+                });
+            }
 
             if (attackedFields.size() != 0) {
                 for (int i = 0; i < attackedFields.size(); ++i) {
@@ -66,19 +89,51 @@ class AiLogic {
 
                     for (int j = 0; j < add; ++j) {
                         attackedFields.get(i).doClick();
-                        game.passTime(150);
+                        game.passTime(DELAY);
                     }
                 }
-            } else {
-                
+                ++c;
+            } else if (defendedFields.size() == firstlyAttackedFieldsCount && !addRemainings) {
+                addRemainings = true;
+                for (int i = 0; i < defendedFields.size(); ++i) {
+                    defendedFields.get(i).doClick();
+                    game.passTime(DELAY);
+                    defendedFields.get(i).doClick();
+                    game.passTime(DELAY);
+                }
+                ++c;
+            } else if (playableFields.size() != 0){
+                BoardButton maxMovesButton = playableFields.get(0);
+                int maxMoves = getMostTurns(maxMovesButton).sideMoves;
+                for (int i = 0; i < playableFields.size(); ++i) {
+                    int iFieldMoves = getMostTurns(playableFields.get(i)).sideMoves;
+                    if (maxMoves < iFieldMoves) {
+                        maxMovesButton = playableFields.get(i);
+                        maxMoves = iFieldMoves;
+                    }
+                }
+
+                maxMoves -= (maxMovesButton.getUnitCount() - 1);
+                for (int i = 0; i < maxMoves; ++i) {
+                    maxMovesButton.doClick();
+                    game.passTime(DELAY);
+                }
+
+                ++c;
+            }
+
+            if (c == 0) {
+                break;
             }
         }
 
-        game.passTime(150);
-        passTurnButton.doClick();
+        game.passTime(DELAY);
+        if (game.addingUnits) {
+            passTurnButton.doClick();
+        }
     }
 
-    private void findMyFields() {
+    private void findMyPlayableFields() {
         playableFields.clear();
 
         for (int i = 0; i < game.boardSize; ++i) {
@@ -90,52 +145,69 @@ class AiLogic {
         }
     }
 
-    private int getMostTurnsSide(BoardButton field) {
-        int result = 0;
-        int maxSide;
+    private void findMyFields() {
+        playableFields.clear();
+
+        for (int i = 0; i < game.boardSize; ++i) {
+            for (int j = 0; j < game.boardSize; ++j) {
+                if (game.board[i][j].getBelonging() == game.turn) {
+                    playableFields.add(game.board[i][j]);
+                }
+            }
+        }
+    }
+
+    private Pair getMostTurns(BoardButton field) {
+        int side = 0;
+        int maxSideMoves;
 
         int x = field.getBoardX();
         int y = field.getBoardY();
 
         int left = 1;
-        while (y > left - 1 && game.board[x][y - left].getBelonging() >= -1) {
+        while (y > left - 1 && game.board[x][y - left].getBelonging() == -1) {
             ++left;
         }
-        maxSide = left;
+        --left;
+        maxSideMoves = left;
 
         int up = 1;
-        while (x > up - 1 && game.board[x - up][y].getBelonging() >= -1) {
+        while (x > up - 1 && game.board[x - up][y].getBelonging() == -1) {
             ++up;
         }
+        --up;
 
-        if (up > maxSide) {
-            maxSide = up;
-            result = 1;
+        if (up > maxSideMoves) {
+            maxSideMoves = up;
+            side = 1;
         }
 
         int right = 1;
         while (y < game.boardSize - right && game.board[x][y + right].getBelonging() == -1) {
             ++right;
         }
+        --right;
 
-        if (right > maxSide) {
-            maxSide = right;
-            result = 2;
+        if (right > maxSideMoves) {
+            maxSideMoves = right;
+            side = 2;
         }
 
         int down = 1;
-        while (x < game.boardSize - down && game.board[x + down][y].getBelonging() >= -1) {
+        while (x < game.boardSize - down && game.board[x + down][y].getBelonging() == -1) {
             ++down;
         }
+        --down;
 
-        if (down > maxSide) {
-            result = 3;
+        if (down > maxSideMoves) {
+            maxSideMoves = down;
+            side = 3;
         }
 
-        return result;
+        return new Pair(side, maxSideMoves);
     }
 
-    private ArrayList<BoardButton> findUnitsUnderAttack() {
+    private ArrayList<BoardButton> findFieldsUnderAttack() {
         ArrayList<BoardButton> result = new ArrayList<>();
 
         for (int i = 0; i < game.boardSize; ++i) {
@@ -149,12 +221,40 @@ class AiLogic {
         return result;
     }
 
-    private ArrayList<BoardButton> findEndangeredUnitsThatAreNotDefended() {
+    private ArrayList<BoardButton> findEndangeredFieldsThatAreNotDefended() {
         ArrayList<BoardButton> result = new ArrayList<>();
 
         for (int i = 0; i < game.boardSize; ++i) {
             for (int j = 0; j < game.boardSize; ++j) {
                 if (game.board[i][j].getBelonging() == game.turn && game.board[i][j].isEndangeredAndNotDefended()) {
+                    result.add(game.board[i][j]);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private ArrayList<BoardButton> findFieldsThatHaveAttackEqualToNeighbours() {
+        ArrayList<BoardButton> result = new ArrayList<>();
+
+        for (int i = 0; i < game.boardSize; ++i) {
+            for (int j = 0; j < game.boardSize; ++j) {
+                if (game.board[i][j].getBelonging() == game.turn && game.board[i][j].isEndangeredAndDefended()) {
+                    result.add(game.board[i][j]);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private ArrayList<BoardButton> findFieldsThatHaveEnemyNeighbours() {
+        ArrayList<BoardButton> result = new ArrayList<>();
+
+        for (int i = 0; i < game.boardSize; ++i) {
+            for (int j = 0; j < game.boardSize; ++j) {
+                if (game.board[i][j].getBelonging() == game.turn && game.board[i][j].hasEnemyNeighbours()) {
                     result.add(game.board[i][j]);
                 }
             }
@@ -224,6 +324,16 @@ class AiLogic {
             } else {
                 game.board[x + 1][y].doClick();
             }
+        }
+    }
+
+    private class Pair {
+        int side;
+        int sideMoves;
+
+        Pair(int side, int sideMoves) {
+            this.side = side;
+            this.sideMoves = sideMoves;
         }
     }
 }

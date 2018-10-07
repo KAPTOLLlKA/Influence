@@ -94,19 +94,55 @@ class BoardButton extends JButton {
             result = true;
         }
 
+        if (unitCount == 1) {
+            result = false;
+        }
+
         return result;
     }
 
     boolean isEndangeredAndNotDefended() {
         boolean result = false;
 
-        if (x > 0 && game.board[x - 1][y].getBelonging() != game.turn && game.board[x - 1][y].getUnitCount() > 1 && game.board[x - 1][y].getUnitCount() > unitCount) {
+        if (x > 0 && game.board[x - 1][y].getBelonging() != game.turn && game.board[x - 1][y].getUnitCount() > unitCount) {
             result = true;
-        } else if (y > 0 && game.board[x][y - 1].getBelonging() != game.turn && game.board[x][y - 1].getUnitCount() > 1 && game.board[x][y - 1].getUnitCount() > unitCount) {
+        } else if (y > 0 && game.board[x][y - 1].getBelonging() != game.turn && game.board[x][y - 1].getUnitCount() > unitCount) {
             result = true;
-        } else if (x < game.boardSize - 1 && game.board[x + 1][y].getBelonging() != game.turn && game.board[x + 1][y].getUnitCount() > 1 && game.board[x + 1][y].getUnitCount() > unitCount) {
+        } else if (x < game.boardSize - 1 && game.board[x + 1][y].getBelonging() != game.turn && game.board[x + 1][y].getUnitCount() > unitCount) {
             result = true;
-        } else if (y < game.boardSize - 1 && game.board[x][y + 1].getBelonging() != game.turn && game.board[x][y + 1].getUnitCount() > 1 && game.board[x][y + 1].getUnitCount() > unitCount) {
+        } else if (y < game.boardSize - 1 && game.board[x][y + 1].getBelonging() != game.turn && game.board[x][y + 1].getUnitCount() > unitCount) {
+            result = true;
+        }
+
+        return result;
+    }
+
+    boolean isEndangeredAndDefended() {
+        boolean result = false;
+
+        if (x > 0 && game.board[x - 1][y].getBelonging() != game.turn && game.board[x - 1][y].getUnitCount() <= unitCount && game.board[x - 1][y].getUnitCount() > 0) {
+            result = true;
+        } else if (y > 0 && game.board[x][y - 1].getBelonging() != game.turn && game.board[x][y - 1].getUnitCount() <= unitCount && game.board[x][y - 1].getUnitCount() > 0) {
+            result = true;
+        } else if (x < game.boardSize - 1 && game.board[x + 1][y].getBelonging() != game.turn && game.board[x + 1][y].getUnitCount() <= unitCount && game.board[x + 1][y].getUnitCount() > 0) {
+            result = true;
+        } else if (y < game.boardSize - 1 && game.board[x][y + 1].getBelonging() != game.turn && game.board[x][y + 1].getUnitCount() <= unitCount && game.board[x][y + 1].getUnitCount() > 0) {
+            result = true;
+        }
+
+        return result;
+    }
+
+    boolean hasEnemyNeighbours() {
+        boolean result = false;
+
+        if (x > 0 && game.board[x - 1][y].getBelonging() != game.turn && game.board[x - 1][y].getBelonging() >= 0) {
+            result = true;
+        } else if (y > 0 && game.board[x][y - 1].getBelonging() != game.turn && game.board[x][y - 1].getBelonging() >= 0) {
+            result = true;
+        } else if (x < game.boardSize - 1 && game.board[x + 1][y].getBelonging() != game.turn && game.board[x + 1][y].getBelonging() >= 0) {
+            result = true;
+        } else if (y < game.boardSize - 1 && game.board[x][y + 1].getBelonging() != game.turn && game.board[x][y + 1].getBelonging() >= 0) {
             result = true;
         }
 
