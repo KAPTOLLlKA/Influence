@@ -111,8 +111,8 @@ class MenuSettingCommands {
 
         JButton P1 = new JButton("Player");
         JButton P2 = new JButton("AI");
-        JButton P3 = new JButton("None");
-        JButton P4 = new JButton("None");
+        JButton P3 = new JButton("--");
+        JButton P4 = new JButton("--");
         JButton next = new JButton("Next");
         JButton back = new JButton("Back");
 
@@ -123,10 +123,10 @@ class MenuSettingCommands {
         next.setForeground(Color.BLACK);
         back.setForeground(Color.BLACK);
 
-        P1.setBackground(game.P1Color);
-        P2.setBackground(game.P2Color);
-        P3.setBackground(game.P3Color);
-        P4.setBackground(game.P4Color);
+        P1.setBackground(Game.P1Color);
+        P2.setBackground(Game.P2Color);
+        P3.setBackground(Game.P3Color);
+        P4.setBackground(Game.P4Color);
         next.setBackground(buttonColor);
         back.setBackground(buttonColor);
 
@@ -230,9 +230,9 @@ class MenuSettingCommands {
                     game.board[i][j] = new BoardButton(game, 0, i, j);
                 } else if (i == 0 && j == game.boardSize - 1) {
                     game.board[i][j] = new BoardButton(game, 1, i, j);
-                } else if (i == 0 && j == 0 && game.p3Mode != game.NONE) {
+                } else if (i == 0 && j == 0 && game.p3Mode != Game.NONE) {
                     game.board[i][j] = new BoardButton(game, 2, i, j);
-                } else if (i == game.boardSize - 1 && j == game.boardSize - 1 && game.p4Mode != game.NONE) {
+                } else if (i == game.boardSize - 1 && j == game.boardSize - 1 && game.p4Mode != Game.NONE) {
                     game.board[i][j] = new BoardButton(game, 3, i, j);
                 } else {
                     game.board[i][j] = new BoardButton(game, -1, i, j);
@@ -246,7 +246,7 @@ class MenuSettingCommands {
 
         game.add(panel);
         game.setVisible(true);
-        if ((game.turn == 0 && game.p1Mode == game.AI) || (game.turn == 1 && game.p2Mode == game.AI) || (game.turn == 2 && game.p3Mode == game.AI) || (game.turn == 3 && game.p4Mode == game.AI)) {
+        if ((game.turn == 0 && game.p1Mode == Game.AI) || (game.turn == 1 && game.p2Mode == Game.AI) || (game.turn == 2 && game.p3Mode == Game.AI) || (game.turn == 3 && game.p4Mode == Game.AI)) {
             game.computerMakeTurn = true;
         }
     }
@@ -263,7 +263,7 @@ class MenuSettingCommands {
         howTo[1] = new JLabel("On your turn you first conquer fields, then add new units to already conquered ones.");
         howTo[2] = new JLabel("On one field there are maximum 8 units.");
         howTo[3] = new JLabel("You can attack/conquer only with fields, that have 2 or more units in them and at least one side that is empty or belongs to enemy.");
-        howTo[4] = new JLabel("To choose field which you want to play from, double click on it.");
+        howTo[4] = new JLabel("To choose field which you want to play from, click on it.");
         howTo[5] = new JLabel("Black fields are walls (they're set randomly).");
         howTo[6] = new JLabel("When attacking enemy, there are few rules:");
         howTo[7] = new JLabel("1) If defending field has equal units to attacking one, then you have 50% chance to conquer it.");
@@ -282,10 +282,10 @@ class MenuSettingCommands {
         panel.add(back);
 
         back.setForeground(Color.BLACK);
-        for (int i = 0; i < howTo.length; ++i) {
-            howTo[i].setForeground(textColor);
-            howTo[i].setFont(buttonFont);
-            panel.add(howTo[i]);
+        for (JLabel j : howTo) {
+            j.setForeground(textColor);
+            j.setFont(buttonFont);
+            panel.add(j);
         }
 
         game.add(panel);
@@ -362,7 +362,7 @@ class MenuSettingCommands {
             sound.setText("Sound: " + (game.sound ? "On" : "Off"));
             if (game.sound) {
                 game.makeButtonSound();
-                game.backgroundMusic = game.getClip("Sounds\\menu background.wav");
+                game.backgroundMusic = game.getClip("Sounds\\background music.wav");
                 game.backgroundMusic.loop(Clip.LOOP_CONTINUOUSLY);
             } else
                 game.backgroundMusic.close();
@@ -396,24 +396,24 @@ class MenuSettingCommands {
             game.makeButtonSound();
             if (player == 0) {
                 ++game.p1Mode;
-                if (game.p1Mode > game.AI) {
-                    game.p1Mode = game.PLAYER;
+                if (game.p1Mode > Game.AI) {
+                    game.p1Mode = Game.PLAYER;
                 }
             } else if (player == 1) {
                 ++game.p2Mode;
-                if (game.p2Mode > game.AI) {
-                    game.p2Mode = game.PLAYER;
+                if (game.p2Mode > Game.AI) {
+                    game.p2Mode = Game.PLAYER;
                 }
             } else if (player == 2) {
                 ++game.p3Mode;
-                if (game.p3Mode > game.AI) {
-                    game.p3Mode = game.NONE;
-                    game.p4Mode = game.NONE;
+                if (game.p3Mode > Game.AI) {
+                    game.p3Mode = Game.NONE;
+                    game.p4Mode = Game.NONE;
                 }
             } else if (player == 3) {
                 ++game.p4Mode;
-                if (game.p3Mode == game.NONE || game.p4Mode > game.AI) {
-                    game.p4Mode = game.NONE;
+                if (game.p3Mode == Game.NONE || game.p4Mode > Game.AI) {
+                    game.p4Mode = Game.NONE;
                 }
             }
             game.setPlayerModeTexts();
@@ -466,10 +466,10 @@ class MenuSettingCommands {
             int decision = JOptionPane.showConfirmDialog(null, "Exit to main menu?", "Confirmation", JOptionPane.YES_NO_OPTION);
             if (decision == 0) {
                 game.menuIndex = 0;
-                game.p1Mode = game.PLAYER;
-                game.p2Mode = game.AI;
-                game.p3Mode = game.NONE;
-                game.p4Mode = game.NONE;
+                game.p1Mode = Game.PLAYER;
+                game.p2Mode = Game.AI;
+                game.p3Mode = Game.NONE;
+                game.p4Mode = Game.NONE;
                 game.ai1 = new AiLogic(game);
                 game.ai2 = new AiLogic(game);
                 game.ai3 = null;
@@ -480,18 +480,20 @@ class MenuSettingCommands {
             }
         }
     }
-
+//I don't know how, but FIX THIS!!!
     private class PassTurnListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            game.makeButtonSound();
+            if (!game.isAi()) {
+                game.makeButtonSound();
+            }
             if (game.addingUnits) {
                 do {
                     ++game.turn;
                     if (game.turn > 3) {
                         game.turn = 0;
                     }
-                } while (game.countPlayerUnits() == 0);
+                } while (game.isNone() || game.countPlayerUnits() == 0);
                 if (game.isAi()) {
                     game.computerMakeTurn = true;
                 }
@@ -502,7 +504,7 @@ class MenuSettingCommands {
             }
             game.passTurnRefreshBoard();
             game.setTurnShower();
-            if (game.computerMakeTurn) {
+            if (game.computerMakeTurn && game.isAi()) {
                 game.start();
             }
         }

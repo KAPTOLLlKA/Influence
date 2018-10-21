@@ -9,7 +9,7 @@ class AiLogic {
 
     private ArrayList<BoardButton> myFields = new ArrayList<>();
 
-    private static final int DELAY = 200;
+    private static final int DELAY = 100;
 
     AiLogic(Game game) {
         this.game = game;
@@ -63,7 +63,8 @@ class AiLogic {
         if (!game.addingUnits) {
             passTurnButton.doClick();
         }
-//There is still an infinite loop way (and check ai to ai turn pass)
+
+        int moves = 0;
         while (game.unitSetCount > 0) {
             int c = 0;
             findMyFields();
@@ -85,14 +86,15 @@ class AiLogic {
                     for (int j = 0; j < add && game.unitSetCount > 0; ++j) {
                         attackedFields.get(i).doClick();
                         game.passTime(DELAY);
+                        ++c;
                     }
                 }
                 for (int i = 0; i < attackedFields.size() && game.unitSetCount > 0; ++i) {
                     attackedFields.get(i).doClick();
                     game.passTime(DELAY);
+                    ++c;
                 }
 
-                ++c;
             }
 
             if (myFields.size() != 0) {
@@ -110,24 +112,28 @@ class AiLogic {
                 for (int i = 0; i < maxMoves; ++i) {
                     maxMovesButton.doClick();
                     game.passTime(DELAY);
+                    ++c;
                 }
 
-                ++c;
-            }
-
-            if (c == 0) {
-                for (int i = 0; i < myFields.size() && game.unitSetCount > 0; ++i) {
-                    if (myFields.get(i).hasSide()) {
-                        while (myFields.get(i).getUnitCount() < 9 && game.unitSetCount > 0) {
-                            myFields.get(i).doClick();
-                            game.passTime(DELAY);
-                        }
-                    }
-                }
             }
 
             if (c == 0 && game.unitSetCount > 0) {
                 break;
+            }
+            ++moves;
+            if (moves > 10000) {
+                System.out.println("Infinite loop");
+            }
+        }
+
+        if (game.unitSetCount > 0) {
+            for (int i = 0; i < myFields.size() && game.unitSetCount > 0; ++i) {
+                if (myFields.get(i).hasSide()) {
+                    while (myFields.get(i).getUnitCount() < 9 && game.unitSetCount > 0) {
+                        myFields.get(i).doClick();
+                        game.passTime(DELAY);
+                    }
+                }
             }
         }
 
@@ -239,79 +245,76 @@ class AiLogic {
         return result;
     }
 
-    private ArrayList<BoardButton> findFieldsThatHaveAttackEqualToNeighbours() {
-        ArrayList<BoardButton> result = new ArrayList<>();
-
-        for (int i = 0; i < game.boardSize; ++i) {
-            for (int j = 0; j < game.boardSize; ++j) {
-                if (game.board[i][j].getBelonging() == game.turn && game.board[i][j].isEndangeredAndDefended()) {
-                    result.add(game.board[i][j]);
-                }
-            }
-        }
-
-        return result;
-    }
-
     private void attackLowestUnitFieldOrRun(BoardButton field) {
         int x = field.getBoardX();
         int y = field.getBoardY();
 
-        int[] nFieldsUnits = new int[4];
+        int[] fieldsUnits = new int[4];
 
         if (y > 0 && game.board[x][y - 1].getBelonging() >= -1 && game.board[x][y - 1].getBelonging() != game.turn) {
-            nFieldsUnits[0] = game.board[x][y - 1].getUnitCount();
+            fieldsUnits[0] = game.board[x][y - 1].getUnitCount();
         } else {
-            nFieldsUnits[0] = -1;
+            fieldsUnits[0] = -1;
         }
         if (x > 0 && game.board[x - 1][y].getBelonging() >= -1 && game.board[x - 1][y].getBelonging() != game.turn) {
-            nFieldsUnits[1] = game.board[x - 1][y].getUnitCount();
+            fieldsUnits[1] = game.board[x - 1][y].getUnitCount();
         } else {
-            nFieldsUnits[1] = -1;
+            fieldsUnits[1] = -1;
         }
         if (y < game.boardSize - 1 && game.board[x][y + 1].getBelonging() >= -1 && game.board[x][y + 1].getBelonging() != game.turn) {
-            nFieldsUnits[2] = game.board[x][y + 1].getUnitCount();
+            fieldsUnits[2] = game.board[x][y + 1].getUnitCount();
         } else {
-            nFieldsUnits[2] = -1;
+            fieldsUnits[2] = -1;
         }
         if (x < game.boardSize - 1 && game.board[x + 1][y].getBelonging() >= -1 && game.board[x + 1][y].getBelonging() != game.turn) {
-            nFieldsUnits[3] = game.board[x + 1][y].getUnitCount();
+            fieldsUnits[3] = game.board[x + 1][y].getUnitCount();
         } else {
-            nFieldsUnits[3] = -1;
+            fieldsUnits[3] = -1;
         }
 
         int minUnits = 9;
-        int toAttackI = 0;
-        int lastZero = 0;
+        int toAttackI = -1;
+        int lastZero = -1;
 
         for (int i = 0; i < 4; ++i) {
-            if (nFieldsUnits[i] < minUnits && nFieldsUnits[i] > 0) {
-                minUnits = nFieldsUnits[i];
-                toAttackI = i;
-            }
-            if (nFieldsUnits[i] == 0) {
-                lastZero = i;
+            if (fieldsUnits[i] != -1) {
+                if (fieldsUnits[i] < minUnits && fieldsUnits[i] > 0) {
+                    minUnits = fieldsUnits[i];
+                    toAttackI = i;
+                } else if (fieldsUnits[i] == 0) {
+                    lastZero = i;
+                }
             }
         }
 
         if (minUnits <= field.getUnitCount() + 1 || (minUnits > field.getUnitCount() + 1 && !field.iHaveEmptySide())) {
-            if (toAttackI == 0) {
+            if (y > 0 && toAttackI == 0) {
                 game.board[x][y - 1].doClick();
-            } else if (toAttackI == 1) {
+            } else if (x > 0 && toAttackI == 1) {
                 game.board[x - 1][y].doClick();
-            } else if (toAttackI == 2) {
+            } else if (y < game.boardSize - 1 && toAttackI == 2) {
                 game.board[x][y + 1].doClick();
-            } else {
+            } else if (x < game.boardSize - 1 && toAttackI == 3) {
+                game.board[x + 1][y].doClick();
+            }
+        } else if (lastZero != -1){
+            if (y > 0 && lastZero == 0) {
+                game.board[x][y - 1].doClick();
+            } else if (x > 0 && lastZero == 1) {
+                game.board[x - 1][y].doClick();
+            } else if (y < game.boardSize - 1 && lastZero == 2) {
+                game.board[x][y + 1].doClick();
+            } else if (x < game.boardSize - 1) {
                 game.board[x + 1][y].doClick();
             }
         } else {
-            if (lastZero == 0) {
+            if (y > 0 && game.board[x][y - 1].getBackground() != Game.WALL && game.board[x][y - 1].getBelonging() != game.turn) {
                 game.board[x][y - 1].doClick();
-            } else if (lastZero == 1) {
+            } else if (x > 0 && game.board[x - 1][y].getBackground() != Game.WALL && game.board[x - 1][y].getBelonging() != game.turn) {
                 game.board[x - 1][y].doClick();
-            } else if (lastZero == 2) {
+            } else if (y < game.boardSize - 1 && game.board[x][y + 1].getBackground() != Game.WALL && game.board[x][y + 1].getBelonging() != game.turn) {
                 game.board[x][y + 1].doClick();
-            } else {
+            } else if (x < game.boardSize - 1 && game.board[x + 1][y].getBackground() != Game.WALL && game.board[x + 1][y].getBelonging() != game.turn) {
                 game.board[x + 1][y].doClick();
             }
         }

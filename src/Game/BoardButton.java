@@ -17,16 +17,16 @@ class BoardButton extends JButton {
     private int x;
     private int y;
 
-    BoardButton(Game Game, int BelongsTo, int X, int Y) {
-        game = Game;
+    BoardButton(Game game1, int BelongsTo, int X, int Y) {
+        game = game1;
         belongsTo = BelongsTo;
         x = X;
         y = Y;
         int fontSize = 30 - game.boardSize;
         setFont(new Font("SansSerif", Font.BOLD, fontSize));
         if (belongsTo == -1) {
-            setBackground(game.rand.nextInt(100) < 15 && canPutHere() ? game.WALL : game.EMPTY);
-            if (getBackground() == game.WALL) {
+            setBackground(game.rand.nextInt(100) < 15 && canPutHere() ? Game.WALL : Game.EMPTY);
+            if (getBackground() == Game.WALL) {
                 belongsTo = -2;
             }
         } else {
@@ -49,9 +49,9 @@ class BoardButton extends JButton {
             result = false;
         } else if ((x == 0 && y == game.boardSize - 2) || (x == 1 && y == game.boardSize - 1) || (x == 1 && y == game.boardSize - 2))
             result = false;
-        else if (game.p3Mode != game.NONE && ((x == 0 && y == 1) || (x == 1 && y == 0) || (x == 1 && y == 2)))
+        else if (game.p3Mode != Game.NONE && ((x == 0 && y == 1) || (x == 1 && y == 0) || (x == 1 && y == 2)))
             result = false;
-        else if (game.p4Mode != game.NONE && ((x == game.boardSize - 2 && y == game.boardSize - 1) || (x == game.boardSize - 1 && y == game.boardSize - 2) || (x == game.boardSize - 2 && y == game.boardSize - 2)))
+        else if (game.p4Mode != Game.NONE && ((x == game.boardSize - 2 && y == game.boardSize - 1) || (x == game.boardSize - 1 && y == game.boardSize - 2) || (x == game.boardSize - 2 && y == game.boardSize - 2)))
             result = false;
 
         return result;
@@ -63,15 +63,15 @@ class BoardButton extends JButton {
     }
 
     void refresh() {
-        if (getBackground() != game.WALL) {
+        if (getBackground() != Game.WALL) {
             if (belongsTo == 0) {
-                setBackground(game.P1Color);
+                setBackground(Game.P1Color);
             } else if (belongsTo == 1) {
-                setBackground(game.P2Color);
-            } else  if (belongsTo == 2) {
-                setBackground(game.P3Color);
+                setBackground(Game.P2Color);
+            } else if (belongsTo == 2) {
+                setBackground(Game.P3Color);
             } else if (belongsTo == 3) {
-                setBackground(game.P4Color);
+                setBackground(Game.P4Color);
             }
             if (active)
                 setBackground(getBackground().brighter());
@@ -117,22 +117,6 @@ class BoardButton extends JButton {
         return result;
     }
 
-    boolean isEndangeredAndDefended() {
-        boolean result = false;
-
-        if (x > 0 && game.board[x - 1][y].getBelonging() != game.turn && game.board[x - 1][y].getUnitCount() <= unitCount && game.board[x - 1][y].getUnitCount() > 0) {
-            result = true;
-        } else if (y > 0 && game.board[x][y - 1].getBelonging() != game.turn && game.board[x][y - 1].getUnitCount() <= unitCount && game.board[x][y - 1].getUnitCount() > 0) {
-            result = true;
-        } else if (x < game.boardSize - 1 && game.board[x + 1][y].getBelonging() != game.turn && game.board[x + 1][y].getUnitCount() <= unitCount && game.board[x + 1][y].getUnitCount() > 0) {
-            result = true;
-        } else if (y < game.boardSize - 1 && game.board[x][y + 1].getBelonging() != game.turn && game.board[x][y + 1].getUnitCount() <= unitCount && game.board[x][y + 1].getUnitCount() > 0) {
-            result = true;
-        }
-
-        return result;
-    }
-
     int getNeighbourFieldsAttack() {
         int result = 0;
 
@@ -159,13 +143,13 @@ class BoardButton extends JButton {
     boolean iHaveEmptySide() {
         boolean result = false;
 
-        if (x > 0 && game.board[x - 1][y].getBackground() != game.EMPTY)
+        if (x > 0 && game.board[x - 1][y].getBackground() != Game.EMPTY)
             result = true;
-        else if (y > 0 && game.board[x][y - 1].getBackground() != game.EMPTY)
+        else if (y > 0 && game.board[x][y - 1].getBackground() != Game.EMPTY)
             result = true;
-        else if (x < game.boardSize - 1 && game.board[x + 1][y].getBackground() != game.EMPTY)
+        else if (x < game.boardSize - 1 && game.board[x + 1][y].getBackground() != Game.EMPTY)
             result = true;
-        else if (y < game.boardSize - 1 && game.board[x][y + 1].getBackground() != game.EMPTY)
+        else if (y < game.boardSize - 1 && game.board[x][y + 1].getBackground() != Game.EMPTY)
             result = true;
 
         return result;
@@ -247,27 +231,28 @@ class BoardButton extends JButton {
     }
 
     private void setSidesWaiting(boolean bool) {
-        if (x > 0 && game.board[x - 1][y].getBackground() != game.WALL && game.board[x - 1][y].getUnitCount() <= 8)
+        if (x > 0 && game.board[x - 1][y].getBackground() != Game.WALL && game.board[x - 1][y].getUnitCount() <= 8)
             game.board[x - 1][y].setWaiting(bool);
-        if (y > 0 && game.board[x][y - 1].getBackground() != game.WALL && game.board[x][y - 1].getUnitCount() <= 8)
+        if (y > 0 && game.board[x][y - 1].getBackground() != Game.WALL && game.board[x][y - 1].getUnitCount() <= 8)
             game.board[x][y - 1].setWaiting(bool);
-        if (x < game.boardSize - 1 && game.board[x + 1][y].getBackground() != game.WALL && game.board[x + 1][y].getUnitCount() <= 8)
+        if (x < game.boardSize - 1 && game.board[x + 1][y].getBackground() != Game.WALL && game.board[x + 1][y].getUnitCount() <= 8)
             game.board[x + 1][y].setWaiting(bool);
-        if (y < game.boardSize - 1 && game.board[x][y + 1].getBackground() != game.WALL && game.board[x][y + 1].getUnitCount() <= 8)
+        if (y < game.boardSize - 1 && game.board[x][y + 1].getBackground() != Game.WALL && game.board[x][y + 1].getUnitCount() <= 8)
             game.board[x][y + 1].setWaiting(bool);
     }
 
     boolean hasSide() {
         boolean result = false;
 
-        if (x > 0 && game.board[x - 1][y].getBackground() != game.WALL && game.board[x - 1][y].getBelonging() != game.turn)
+        if (x > 0 && game.board[x - 1][y].getBackground() != Game.WALL && game.board[x - 1][y].getBelonging() != game.turn) {
             result = true;
-        else if (y > 0 && game.board[x][y - 1].getBackground() != game.WALL && game.board[x][y - 1].getBelonging() != game.turn)
+        } else if (y > 0 && game.board[x][y - 1].getBackground() != Game.WALL && game.board[x][y - 1].getBelonging() != game.turn) {
             result = true;
-        else if (x < game.boardSize - 1 && game.board[x + 1][y].getBackground() != game.WALL && game.board[x + 1][y].getBelonging() != game.turn)
+        } else if (x < game.boardSize - 1 && game.board[x + 1][y].getBackground() != Game.WALL && game.board[x + 1][y].getBelonging() != game.turn) {
             result = true;
-        else if (y < game.boardSize - 1 && game.board[x][y + 1].getBackground() != game.WALL && game.board[x][y + 1].getBelonging() != game.turn)
+        } else if (y < game.boardSize - 1 && game.board[x][y + 1].getBackground() != Game.WALL && game.board[x][y + 1].getBelonging() != game.turn) {
             result = true;
+        }
 
         return result;
     }
@@ -278,9 +263,13 @@ class BoardButton extends JButton {
                 if (!waiting) {
                     if (!active && thereIsNoActive()) {
                         setActive(true);
+                        if (game.sound && !game.isAi())
+                            game.getClip("Sounds\\accept.wav").start();
                     } else if (!active) {
                         findActiveAndRemoveIt();
                         setActive(true);
+                        if (game.sound && !game.isAi())
+                            game.getClip("Sounds\\accept.wav").start();
                     } else {
                         setActive(false);
                     }
@@ -288,6 +277,8 @@ class BoardButton extends JButton {
                     if (!active) {
                         findActiveAndRemoveIt();
                         setActive(true);
+                        if (game.sound && !game.isAi())
+                            game.getClip("Sounds\\accept.wav").start();
                     } else
                         setActive(false);
                 }
@@ -362,8 +353,7 @@ class BoardButton extends JButton {
                     text = "Reds";
                 } else if (winner == 2) {
                     text = "Greens";
-                }
-                else if (winner == 3) {
+                } else if (winner == 3) {
                     text = "Oranges";
                 }
 
@@ -372,6 +362,8 @@ class BoardButton extends JButton {
             }
         } else if (game.unitSetCount > 0 && belongsTo == game.turn && unitCount < 8) {
             addUnit();
+            if (game.sound && !game.isAi())
+                game.getClip("Sounds\\add.wav").start();
             --game.unitSetCount;
             game.setTurnShower();
         }

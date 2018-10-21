@@ -11,23 +11,23 @@ import java.util.Random;
 public class Game extends JFrame {
     Random rand = new Random();
 
-    final int NONE = 0;
-    final int PLAYER = 1;
-    final int AI = 2;
+    final static int NONE = 0;
+    final static int PLAYER = 1;
+    final static int AI = 2;
 
     int boardSize;
     int turn;
 
-    Clip backgroundMusic = getClip("Sounds\\menu background.wav");
+    Clip backgroundMusic = getClip("Sounds\\background music.wav");
 
     BoardButton[][] board;
 
-    final Color WALL = Color.BLACK;
-    final Color EMPTY = Color.DARK_GRAY;
-    final Color P1Color = new Color(0, 170, 200);
-    final Color P2Color = new Color(175, 0, 0);
-    final Color P3Color = new Color(0, 175, 0);
-    final Color P4Color = new Color(180, 120, 0);
+    final static Color WALL = Color.BLACK;
+    final static Color EMPTY = Color.DARK_GRAY;
+    final static Color P1Color = new Color(0, 170, 200);
+    final static Color P2Color = new Color(175, 0, 0);
+    final static Color P3Color = new Color(0, 175, 0);
+    final static Color P4Color = new Color(180, 120, 0);
 
     private BackgroundPanel background = new BackgroundPanel();
     private MenuSettingCommands menus = new MenuSettingCommands(this, background);
@@ -155,6 +155,22 @@ public class Game extends JFrame {
         return result;
     }
 
+    boolean isPlayer() {
+        boolean result = false;
+
+        if (turn == 0 && p1Mode == PLAYER) {
+            result = true;
+        } else if (turn == 1 && p2Mode == PLAYER) {
+            result = true;
+        } else if (turn == 2 && p3Mode == PLAYER) {
+            result = true;
+        } else if (turn == 3 && p4Mode == PLAYER) {
+            result = true;
+        }
+
+        return result;
+    }
+
     void refreshBoard() {
         for (int i = 0; i < boardSize; ++i) {
             for (int j = 0; j < boardSize; ++j) {
@@ -226,7 +242,7 @@ public class Game extends JFrame {
         }
 
         if (p3Mode == NONE) {
-            p3Button.setText("None");
+            p3Button.setText("--");
         } else if (p3Mode == PLAYER) {
             p3Button.setText("Player");
         } else if (p3Mode == AI) {
@@ -234,7 +250,7 @@ public class Game extends JFrame {
         }
 
         if (p4Mode == NONE) {
-            p4Button.setText("None");
+            p4Button.setText("--");
         } else if (p4Mode == PLAYER) {
             p4Button.setText("Player");
         } else if (p4Mode == AI) {
