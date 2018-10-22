@@ -245,9 +245,10 @@ class MenuSettingCommands {
         panel.add(turnShower);
 
         game.add(panel);
-        game.setVisible(true);
-        if ((game.turn == 0 && game.p1Mode == Game.AI) || (game.turn == 1 && game.p2Mode == Game.AI) || (game.turn == 2 && game.p3Mode == Game.AI) || (game.turn == 3 && game.p4Mode == Game.AI)) {
+
+        if (game.isAi()) {
             game.computerMakeTurn = true;
+            game.refreshBoard();
         }
     }
 
@@ -466,6 +467,8 @@ class MenuSettingCommands {
             int decision = JOptionPane.showConfirmDialog(null, "Exit to main menu?", "Confirmation", JOptionPane.YES_NO_OPTION);
             if (decision == 0) {
                 game.menuIndex = 0;
+                game.boardSize = 0;
+                game.turn = -1;
                 game.p1Mode = Game.PLAYER;
                 game.p2Mode = Game.AI;
                 game.p3Mode = Game.NONE;
@@ -480,7 +483,7 @@ class MenuSettingCommands {
             }
         }
     }
-//I don't know how, but FIX THIS!!!
+
     private class PassTurnListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -504,7 +507,7 @@ class MenuSettingCommands {
             }
             game.passTurnRefreshBoard();
             game.setTurnShower();
-            if (game.computerMakeTurn && game.isAi()) {
+            if (game.computerMakeTurn) {
                 game.start();
             }
         }

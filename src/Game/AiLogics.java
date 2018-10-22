@@ -14,11 +14,22 @@ class AiLogic {
     AiLogic(Game game) {
         this.game = game;
     }
-
+//DEBUG THIS SHIT!!!
     void makeTurn() {
         JButton passTurnButton = game.getPassTurnButton();
         findMyPlayableFields();
 
+        makeMoves();
+
+        passTurnButton.doClick();
+
+        setUnits();
+
+        game.passTime(DELAY);
+        passTurnButton.doClick();
+    }
+
+    private void makeMoves() {
         while (myFields.size() > 0) {
             ArrayList<BoardButton> attackedFields = findFieldsUnderAttack();
 
@@ -59,11 +70,9 @@ class AiLogic {
             game.passTime(DELAY);
             findMyPlayableFields();
         }
+    }
 
-        if (!game.addingUnits) {
-            passTurnButton.doClick();
-        }
-
+    private void setUnits() {
         int moves = 0;
         while (game.unitSetCount > 0) {
             int c = 0;
@@ -135,11 +144,6 @@ class AiLogic {
                     }
                 }
             }
-        }
-
-        game.passTime(DELAY);
-        if (game.addingUnits) {
-            passTurnButton.doClick();
         }
     }
 

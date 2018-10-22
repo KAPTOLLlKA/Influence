@@ -27,7 +27,7 @@ public class Game extends JFrame {
     final static Color P1Color = new Color(0, 170, 200);
     final static Color P2Color = new Color(175, 0, 0);
     final static Color P3Color = new Color(0, 175, 0);
-    final static Color P4Color = new Color(180, 120, 0);
+    final static Color P4Color = new Color(200, 120, 0);
 
     private BackgroundPanel background = new BackgroundPanel();
     private MenuSettingCommands menus = new MenuSettingCommands(this, background);
@@ -79,6 +79,7 @@ public class Game extends JFrame {
         } else if (menuIndex == 3) {
             menus.setBoardSizeMenu();
         } else if (menuIndex == 4) {
+            menuIndex = -1;
             int playerCount = 2;
             if (p3Mode != NONE) {
                 ++playerCount;
@@ -88,8 +89,9 @@ public class Game extends JFrame {
                     ai4 = new AiLogic(this);
                 }
             }
-            turn = (rand.nextInt(playerCount));
+            turn = 2/*(rand.nextInt(playerCount))*/;
             menus.setGameStart();
+            setVisible(true);
         } else if (menuIndex == 5) {
             menus.setHowToPlayMenu();
         }
